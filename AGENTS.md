@@ -17,6 +17,18 @@ it on specific microcontrollers and development boards.
 Follow this layout when adding documentation. Preserve the original board
 designation (including Cyrillic characters) in directory names.
 
+## Temporary Files
+
+`.tmp/` is the local scratch directory for temporary files (builds, clones,
+logs, experiments). It is gitignored; only `.tmp/.gitkeep` is tracked so the
+directory exists after a fresh clone.
+
+- Put disposable artifacts (toolchain downloads, cloned repositories,
+  test logs) in `.tmp/`, never in the repo root or `docs/`.
+- Nothing in `.tmp/` (except `.gitkeep`) may be committed.
+- Treat contents as disposable: agents may create and delete files there
+  freely without asking.
+
 ## Guardrails
 
 - Write agent instructions, skills, and documentation in English only.
