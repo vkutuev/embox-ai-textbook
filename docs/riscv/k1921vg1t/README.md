@@ -18,6 +18,11 @@ the official user manual, errata, and quick-start guide.
 - [Debugging](debugging.md) — JTAG, OpenOCD, toolchain, SDK
 - [Errata](errata.md) — known silicon issues and workarounds
 
+## Boards
+
+- [КФДЛ.441461.050 (NIIET-DEV-K1921VG1T)](КФДЛ.441461.050/README.md) —
+  dev board bring-up with Embox (verified Hello World run)
+
 ## Embox relevance
 
 The most important facts for bringing up Embox on K1921VG1T:
