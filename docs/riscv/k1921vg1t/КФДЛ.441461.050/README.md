@@ -60,6 +60,44 @@ Relevant files: `tools/openocd/scripts/interface/jlink.cfg`,
 - The `k1921vg1t` flash driver displays CFGWORD write protection as
   "enable", but register-based erase/write still works.
 
+## Flashing in dualcore mode (SRV-ON jumper)
+
+The dualcore OpenOCD configs from the SDK (`k1921vg1t.cfg`,
+`k1921vg1t_dualcore.cfg`) only work when the chip is in DUALCORE mode.
+After power-on the chip starts in LOCKSTEP mode (default CFGWORD,
+`LOCKSTEPEN=1`), where the two cores form a single logical hart — the
+dualcore config fails with `Hart index 1 is too large` / `unavailable`.
+
+The SRV-ON jumper pulls the `SERVEN` pin high. When the board is reset
+with the jumper on, the chip enters **service mode** (UM chapter 9.4):
+
+- Flash reads return zeros, so the configuration word (CFGWORD at
+  `0x003F_FFF0`) reads as `0x00000000` → `LOCKSTEPEN=0` → the cores start
+  in **DUALCORE mode** and each exposes its own debug hart.
+- The `JTAGEN` bit is ignored, so debug is always available.
+- Flash write protection (`FLASHWE`) reads as disabled; in service mode
+  the flash is locked for reading/execution and only the full erase
+  (`k1921vg1t srv_erase` via `SIU.SERVCTL`) is allowed — after the erase
+  the flash controller accepts programming through the register
+  interface.
+
+Procedure:
+
+1. Ask the user to place the SRV-ON jumper and power-cycle the board.
+2. Connect OpenOCD with the SDK dualcore config
+   (`openocd-snippets/k1921vg1t/connect_jlink_jtag.cfg`).
+3. Run `k1921vg1t srv_erase` (full erase, incl. NVR/CFGWORD), then flash
+   the image (`flash write_image ... verify`).
+4. Ask the user to remove the jumper and power-cycle again. With the
+   jumper off, the chip reads the real CFGWORD (all-ones after erase →
+   `LOCKSTEPEN=1`) and starts in LOCKSTEP mode again — Embox runs fine
+   in both modes.
+
+> **Agent instruction**: when flashing this board with a dualcore config,
+> always ask the user to place the SRV-ON jumper and power-cycle the
+> board first, and to remove the jumper and power-cycle again after
+> flashing.
+
 ## Flashing and running
 
 OpenOCD config (lockstep, J-Link):
