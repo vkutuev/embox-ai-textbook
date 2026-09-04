@@ -12,6 +12,8 @@ it on specific microcontrollers and development boards.
 
 - `docs/<arch>/<microcontroller>/<board>` — board-specific documentation,
   e.g. `docs/riscv/k1921vg1t/КФДЛ.441461.050`
+- `docs/<arch>/<microcontroller>/` — microcontroller-level documentation
+  (core, memory map, peripherals), e.g. `docs/riscv/k1921vg1t/`
 - `docs/embox/` — architecture-agnostic Embox documentation
 
 Follow this layout when adding documentation. Preserve the original board
@@ -25,6 +27,10 @@ directory exists after a fresh clone.
 
 - Put disposable artifacts (toolchain downloads, cloned repositories,
   test logs) in `.tmp/`, never in the repo root or `docs/`.
+- Never reference `.tmp/` as a source in documentation or agent
+  instructions: `.tmp/` is disposable scratch space and disappears.
+  Always cite the canonical upstream source instead (document title,
+  upstream repository path/URL, or official page).
 - Nothing in `.tmp/` (except `.gitkeep`) may be committed.
 - Treat contents as disposable: agents may create and delete files there
   freely without asking.
@@ -39,6 +45,8 @@ directory exists after a fresh clone.
 - Never commit changes without explicit user approval.
 - Do not add code comments unless asked.
 - Follow existing file conventions when editing.
+- Never cite `.tmp/` as a source in documentation or instructions: always
+  cite the canonical upstream source (see "Temporary Files").
 
 ## Workflow
 

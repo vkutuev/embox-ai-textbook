@@ -20,4 +20,5 @@ official Embox documentation and wiki.
 Documents derived from upstream sources carry a **Sources** footer linking to
 the original pages in
 [embox/embox-docs](https://github.com/embox/embox-docs) (English version) and
-the [Embox wiki](https://github.com/embox/embox/wiki).
+the [Embox wiki](https://github.com/embox/embox/wiki). Never cite local
+scratch files as sources: always link the canonical upstream page.
