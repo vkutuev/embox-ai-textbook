@@ -33,11 +33,21 @@ the second tap and prints
 
 ## Reset behavior
 
-- **SRST is not wired** on this adapter/board combination:
-  `adapter assert srst` leaves the UART CR register (`0x52010030`)
-  unchanged, so the J-Link RESET pin does not reach the MCU reset.
-- `reset init`/`reset halt` always time out:
-  `Hart didn't leave reset in 5s; dmstatus=0x400382 (allhavereset=false)`.
+> **Superseded note.** "SRST is not wired" below was a
+> setup-specific observation: the adapter had been connected with the
+> board nRST on the J-Link **nTRST** pin. With the corrected wiring
+> (nRST → J-Link RESET pin 15) the SRST pulse does reset the MCU — see
+> the verified wiring in [README.md](README.md).
+
+- **SRST was not reaching the MCU in this setup:**
+  `adapter assert srst` left the UART CR register (`0x52010030`)
+  unchanged, because the J-Link RESET pin was not wired to the board
+  nRST.
+- `reset init`/`reset halt` always time out on this chip:
+  `Hart didn't leave reset in 5s; dmstatus=0x400382 (allhavereset=false)` —
+  the debug module never reports `havereset`, even with a working SRST.
+  Use a manual SRST pulse (`adapter assert srst` / `deassert srst`) or
+  `ndmreset` instead.
 - **`ndmreset` works**: writing `dmcontrol` (`dmi 0x10`) with bit 1 set
   resets the whole system from the debug module:
 
@@ -55,8 +65,10 @@ chip had already booted once left the UART clock domain corrupted:
 the console produced garbage at 115200 (wrong effective baud) and the
 receive FIFO flooded with break/framing errors, even though all register
 settings looked correct (RCU `UARTCFG0=0x111` = HSE 27 MHz, `CPE=0`,
-pl011 `IBRD/FBRD` = 115200 @ 27 MHz). A full system reset via
-`ndmreset` restores the console.
+pl011 `IBRD/FBRD` = 115200 @ 27 MHz). A full system reset (SRST pulse or
+`ndmreset`) restores the console. Note: with a re-enumerated CH340B node
+the same garbage is usually just a host-side baud issue — see
+[debug-checklist.md](debug-checklist.md).
 
 ## Working bring-up sequence (no SRST)
 

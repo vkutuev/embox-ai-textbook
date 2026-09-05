@@ -124,6 +124,15 @@ Detailed experiment records:
 - [GDB `load` flash](experiment-gdb-flash.md) — GDB flow, event
   overrides, throughput, toolchain notes
 
+Diagnostic helpers:
+
+- [Debug checklist](debug-checklist.md) — ordered isolation steps for
+  console/reset problems
+- [tools/uart_capture.sh](tools/uart_capture.sh) — serial capture with
+  explicit baud
+- [tools/dump_state.cfg](tools/dump_state.cfg) — OpenOCD register dump
+  for state inspection
+
 ## Flashing in dualcore mode (SRV-ON jumper)
 
 The dualcore OpenOCD configs from the SDK (`k1921vg1t.cfg`,
