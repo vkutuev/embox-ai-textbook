@@ -53,6 +53,15 @@ From the official board documentation (see Sources):
 - **JTAG** — connector XP7: pin 2 = TMS, 4 = TCK, 6 = TDO, 8 = TDI,
   10 = **nRST** (RST# of the MCU), odd pins 1/3/5/7/9 = +3V3/GND/NC.
   **TRST** is on a separate connector XP8.
+- **J-Link wiring.** The board nRST must go to the J-Link **RESET
+  (nSRST) pin** (pin 15 of the standard 20-pin connector), not to
+  **nTRST** (pin 3): nTRST resets only the JTAG TAP controllers. Wiring
+  board nRST to J-Link nTRST makes `adapter assert srst` a no-op and
+  sends OpenOCD's TRST pulses into the MCU RST#, causing unexpected
+  reboots. Optional: XP8 (TRST) → J-Link nTRST (pin 3); XP7 +3V3 →
+  J-Link VTref (pin 1). Use
+  `reset_config trst_and_srst srst_open_drain` (J-Link RESET is
+  open-drain, not push-pull).
 - **Service mode** — jumper between `SRV` (18) and `ON` (17) on XP3
   pulls SERVEN high (see "Flashing in dualcore mode" below).
 - **Reset** — `RESET` button (SB2), `RST#` on XP3 pin 39, or `DTR#` of
@@ -71,11 +80,13 @@ From the official board documentation (see Sources):
   targets; the singlecore config or one target on tap `cpu1` with
   `-coreid 0` works. IDCODE of both taps is `0xDEB15001`, IR length 5.
 - **No hardware reset via J-Link (in our setup).** `reset init` times out
-  ("Hart didn't leave reset in 5s; dmstatus=0x400382"). Note: the board
-  does route nRST to XP7 pin 10, so check the adapter cable and try
-  `reset_config trst_and_srst srst_open_drain` (J-Link RESET is
-  open-drain). Reliable alternative: system reset via the debug module
-  (ndmreset) — `riscv dmi_write 0x10 0x80000003` then
+  ("Hart didn't leave reset in 5s; dmstatus=0x400382"). Root cause:
+  board nRST was wired to J-Link **nTRST** instead of **RESET** (see
+  "J-Link wiring" above) — `adapter assert srst` did nothing, and TRST
+  pulses went into the MCU RST#. With correct wiring
+  (`srst_open_drain`) hardware reset works. Reliable alternative:
+  system reset via the debug module (ndmreset) —
+  `riscv dmi_write 0x10 0x80000003` then
   `riscv dmi_write 0x10 0x80000001`; the core then sits at the reset
   vector (`pc = 0`).
 - **UART corruption after hart-only resets/soft restarts.** A hart reset
