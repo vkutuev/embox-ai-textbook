@@ -53,15 +53,15 @@ From the official board documentation (see Sources):
 - **JTAG** — connector XP7: pin 2 = TMS, 4 = TCK, 6 = TDO, 8 = TDI,
   10 = **nRST** (RST# of the MCU), odd pins 1/3/5/7/9 = +3V3/GND/NC.
   **TRST** is on a separate connector XP8.
-- **J-Link wiring.** The board nRST must go to the J-Link **RESET
-  (nSRST) pin** (pin 15 of the standard 20-pin connector), not to
-  **nTRST** (pin 3): nTRST resets only the JTAG TAP controllers. Wiring
-  board nRST to J-Link nTRST makes `adapter assert srst` a no-op and
-  sends OpenOCD's TRST pulses into the MCU RST#, causing unexpected
-  reboots. Optional: XP8 (TRST) → J-Link nTRST (pin 3); XP7 +3V3 →
-  J-Link VTref (pin 1). Use
-  `reset_config trst_and_srst srst_open_drain` (J-Link RESET is
-  open-drain, not push-pull).
+- **J-Link wiring (verified).** Board nRST (XP7 pin 10) → J-Link
+  **RESET** (pin 15 of the standard 20-pin connector), XP7 +3V3 → J-Link
+  VTref (pin 1), XP8 (TRST) → J-Link nTRST (pin 3). Wiring nRST to
+  nTRST makes `adapter assert srst` a no-op and sends OpenOCD's TRST
+  pulses into the MCU RST#. Use
+  `reset_config srst_only srst_open_drain connect_deassert_srst`.
+  Do **not** use `trst_and_srst`: with TRST wired to XP8, TRST pulses
+  reset the debug module and desynchronize OpenOCD (DMI timeouts after
+  `init`).
 - **Service mode** — jumper between `SRV` (18) and `ON` (17) on XP3
   pulls SERVEN high (see "Flashing in dualcore mode" below).
 - **Reset** — `RESET` button (SB2), `RST#` on XP3 pin 39, or `DTR#` of
@@ -79,21 +79,26 @@ From the official board documentation (see Sources):
   dualcore config from the SDK (`k1921vg1t.cfg`) fails to examine both
   targets; the singlecore config or one target on tap `cpu1` with
   `-coreid 0` works. IDCODE of both taps is `0xDEB15001`, IR length 5.
-- **No hardware reset via J-Link (in our setup).** `reset init` times out
-  ("Hart didn't leave reset in 5s; dmstatus=0x400382"). Root cause:
-  board nRST was wired to J-Link **nTRST** instead of **RESET** (see
-  "J-Link wiring" above) — `adapter assert srst` did nothing, and TRST
-  pulses went into the MCU RST#. With correct wiring
-  (`srst_open_drain`) hardware reset works. Reliable alternative:
-  system reset via the debug module (ndmreset) —
+- **Hardware reset works, but `reset init` still fails.** With the
+  corrected wiring, `adapter assert srst` really resets the MCU (the
+  debug module goes dead during the pulse and Embox reboots from flash).
+  However, OpenOCD's `reset init`/`reset halt` still time out
+  ("Hart didn't leave reset in 5s; dmstatus=0x400382") — the debug
+  module never reports `havereset` after SRST. Use a manual pulse
+  instead: `adapter assert srst; sleep 300; adapter deassert srst`
+  (verified: clean Embox boot and `hello_world`). Alternative: system
+  reset via the debug module (ndmreset) —
   `riscv dmi_write 0x10 0x80000003` then
-  `riscv dmi_write 0x10 0x80000001`; the core then sits at the reset
-  vector (`pc = 0`).
+  `riscv dmi_write 0x10 0x80000001`.
+- **Host serial baud.** The CH340B node re-enumerates after reconnecting
+  and comes up at a default baud; garbage at 115200 capture means the
+  host side: run `stty -F /dev/ttyUSB0 115200 raw -echo` first.
 - **UART corruption after hart-only resets/soft restarts.** A hart reset
   or `reg pc 0x0` + `resume` on an already-booted chip left the console
   outputting garbage at 115200 (broken UART clock domain) while the
-  kernel kept running. A full `ndmreset` restores the console. Always do
-  an `ndmreset` before starting a freshly flashed image.
+  kernel kept running. A full system reset (SRST pulse or `ndmreset`)
+  restores the console. Always do a system reset before starting a
+  freshly flashed image.
 - The `k1921vg1t` flash driver displays CFGWORD write protection as
   "enable", but register-based erase/write still works.
 - **Actual core frequency is 60 MHz, not 150 MHz.** The board config and
@@ -108,9 +113,9 @@ From the official board documentation (see Sources):
 | ---- | -------- |
 | Flash in LOCKSTEP (default) | `target/k1921vg1t_singlecore.cfg` + `interface/jlink.cfg`, or a one-tap cfg (see below); halt, erase, `flash write_image`, `verify_image` |
 | Flash in DUALCORE | SRV-ON jumper + reset, then SDK dualcore config (see below) |
-| Hardware reset | SRST via XP7 pin 10 (check wiring) or `ndmreset` from the debug module |
+| Hardware reset | `adapter assert srst; sleep 300; adapter deassert srst` (verified; `reset init` is broken on this chip) or `ndmreset` from the debug module |
 | Flash via GDB | override `gdb-flash-erase-start`/`gdb-flash-write-end` with `halt`, then `load` + `compare-sections` |
-| Run flashed image | `riscv dmi_write 0x10 0x80000003` / `0x80000001`, `reg pc 0x0`, `resume` |
+| Run flashed image | SRST pulse (see above), or `riscv dmi_write 0x10 0x80000003` / `0x80000001`, `reg pc 0x0`, `resume` |
 
 Detailed experiment records:
 
