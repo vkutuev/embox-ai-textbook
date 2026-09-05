@@ -17,6 +17,42 @@ The K1921VG1T is based on the dual-core SCR5 RISC-V CPU.
 - Lockstep mode available (LOCKSTEPEN in CFGWORD); DualCore is the
   alternative mode.
 
+## Lockstep vs dualcore
+
+The two cores run in one of two modes, selected at power-on reset by the
+`LOCKSTEPEN` bit of the configuration word (default: LOCKSTEP):
+
+- **LOCKSTEP** — one core is the working core, the second is a shadow
+  checker executing the same program. A comparison module compares the
+  output buses of both cores (nodes IC, DC, L1I, L1D, SMP); on mismatch it
+  signals an error to the SIU (self-testing is available). The working
+  core's outputs are delayed by 2 clock cycles, the checker's inputs by
+  2 clock cycles. PLIC signals and the L2 interface are not compared.
+  From the software and debug perspective the pair is a **single logical
+  hart**: the debug module exposes only hart 0.
+- **DUALCORE** — the cores run independently, each with its own debug
+  module and its own hart (`mhartid` 0 and 1). This is the mode for SMP
+  use (Embox supports RISC-V SMP: `embox.arch.riscv.kernel.smp`,
+  `embox.kernel.cpu.smp`, see `templates/riscv/smp`).
+
+Runtime switching is allowed if `SWMODEEN` and `LOCKSTEPEN` in CFGWORD
+permit it: write `1` to the `DUALCORE` field of the SIU `CORE1_CONF`
+register (offset +1Ch, key `0xACCE55` in `CODE[31:8]`); this resets the
+MCU and sets the `LSTEP` bit in the RCU `RSTSTAT` register. The `RVECT`
+register (offset +18h) holds the reset vector of core 1 in DUALCORE mode.
+
+Consequences for debugging and flashing:
+
+- In LOCKSTEP mode dualcore OpenOCD configs (two targets with coreid 0
+  and 1) fail — the second hart does not exist ("Hart index 1 is too
+  large"). A single-target config with `-coreid 0` works.
+- In DUALCORE mode both harts are visible and controllable
+  independently or as an SMP group.
+- Service mode (SERVEN=1 during reset) makes the CFGWORD read as zeros,
+  so the chip starts in DUALCORE mode — see
+  [КФДЛ.441461.050](КФДЛ.441461.050/README.md) for the flashing
+  procedure.
+
 ## Privilege levels
 
 The core supports three privilege modes: machine (M), supervisor (S), and

@@ -21,7 +21,10 @@ the official user manual, errata, and quick-start guide.
 ## Boards
 
 - [КФДЛ.441461.050 (NIIET-DEV-K1921VG1T)](КФДЛ.441461.050/README.md) —
-  dev board bring-up with Embox (verified Hello World run)
+  dev board bring-up with Embox (verified Hello World run), flashing
+  guide, and experiment records:
+  [SDK OpenOCD configurations](КФДЛ.441461.050/experiment-sdk-openocd-configs.md),
+  [GDB `load` flash](КФДЛ.441461.050/experiment-gdb-flash.md)
 
 ## Embox relevance
 
