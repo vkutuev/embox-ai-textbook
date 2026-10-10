@@ -24,7 +24,8 @@ the official user manual, errata, and quick-start guide.
   dev board bring-up with Embox (verified Hello World run), flashing
   guide, and experiment records:
   [SDK OpenOCD configurations](КФДЛ.441461.050/experiment-sdk-openocd-configs.md),
-  [GDB `load` flash](КФДЛ.441461.050/experiment-gdb-flash.md)
+  [GDB `load` flash](КФДЛ.441461.050/experiment-gdb-flash.md),
+  [LED/button counter example](КФДЛ.441461.050/example-led-button-counter.md)
 
 ## Embox relevance
 

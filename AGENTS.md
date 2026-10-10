@@ -15,6 +15,8 @@ it on specific microcontrollers and development boards.
 - `docs/<arch>/<microcontroller>/` — microcontroller-level documentation
   (core, memory map, peripherals), e.g. `docs/riscv/k1921vg1t/`
 - `docs/embox/` — architecture-agnostic Embox documentation
+- `examples/<board>/<example>/` — runnable example sources (C code,
+  Mybuild files) referenced from the board documentation
 
 Follow this layout when adding documentation. Preserve the original board
 designation (including Cyrillic characters) in directory names.

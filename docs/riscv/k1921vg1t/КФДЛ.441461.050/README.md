@@ -133,6 +133,13 @@ Diagnostic helpers:
 - [tools/dump_state.cfg](tools/dump_state.cfg) — OpenOCD register dump
   for state inspection
 
+## Examples
+
+- [LED/button counter](example-led-button-counter.md) — USER button
+  increments a counter shown in binary on the four LEDs; three variants
+  (polling, GPIO interrupt, input subsystem), sources in
+  [examples/niet-dev-k1921vg1t/led_button_counter/](../../../../examples/niet-dev-k1921vg1t/led_button_counter/)
+
 ## Flashing in dualcore mode (SRV-ON jumper)
 
 The dualcore OpenOCD configs from the SDK (`k1921vg1t.cfg`,

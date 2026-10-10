@@ -30,6 +30,13 @@ Ports support interrupt generation (interrupt vectors 8-14) and hardware
 request generation for DMA/peripherals, plus configuration lock and mask
 mechanisms.
 
+## Embox GPIO driver
+
+The Embox `k1921vg1t_dev` template includes
+`embox.driver.gpio.niiet_gpio(altfunc_field_width=4)` and exposes the
+ports through the standard GPIO API (`src/drivers/gpio/gpio.h`). Board
+usage: [LED/button counter example](КФДЛ.441461.050/example-led-button-counter.md).
+
 ## Sources
 
 - `doc/K1921VG1T/UM_K1921VG1T_10YA.pdf` in
