@@ -1,0 +1,21 @@
+# NIIET-DEV-K1921VG1T LED/button counter examples
+#
+# Install: copy this directory into an Embox checkout:
+#
+#     cp -r led_button_counter/ <embox>/src/cmds/example/
+#
+# then add the lines for ONE variant inside the conf block of
+# platform/niiet/templates/k1921vg1t_dev/mods.conf.
+#
+# Full instructions: see the guide in the textbook repository,
+# docs/riscv/k1921vg1t/КФДЛ.441461.050/example-led-button-counter.md
+
+# Variant 1: polling
+include embox.cmd.example.led_button_counter.led_counter_poll
+
+# Variant 2: interrupt-driven
+include embox.cmd.example.led_button_counter.led_counter_irq
+
+# Variant 3: input subsystem (needs the button driver too)
+include embox.driver.input.button.gpio_button(pin_port=1, pin_num=3)
+include embox.cmd.example.led_button_counter.led_counter_input
