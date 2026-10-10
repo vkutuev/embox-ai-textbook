@@ -4,15 +4,15 @@
  *        LED/button counter examples.
  *
  * Board resources, per the NIIET SDK BSP
- * (hardware/bsp/NIIET-DEV-K1921VG1T/bsp.h):
- *  - LEDs LED0..LED3 on GPIOC pins 12..15, active-low:
- *    clearing a DATAOUT bit lights the LED.
- *  - USER button on GPIOB pin 3.
+ * (hardware/bsp/NIIET-DEV-K1921VG1T/bsp.h), verified on hardware:
+ *  - LEDs LED0..LED3 on GPIOC pins 12..15, active-high:
+ *    driving a pin high lights the LED. (The SDK BSP code implies the
+ *    opposite — BSP_LED_On() clears the output bit — but active-high
+ *    was confirmed empirically on this board.)
+ *  - USER button on GPIOB pin 3, active-low: the pin reads high when
+ *    released and low while pressed.
  *
- * The button polarity is not yet verified on hardware; the examples
- * assume press = low (pull-up + button to ground). If the board wires
- * it the other way, invert the press test in the sources or switch
- * the IRQ edge in led_counter_irq.c.
+ * All examples assume press = low (pull-up + button to ground).
  */
 
 #ifndef LED_BUTTON_COUNTER_BOARD_H_
@@ -29,18 +29,19 @@
 #define BTN_PIN         (1U << 3)
 
 /*
- * LEDs are active-low. gpio_set() applies one level to a whole pin
- * mask, so write all-off first and then pull the "on" bits low.
+ * LEDs on this board are active-high. gpio_set() applies one level to
+ * a whole pin mask, so write all-off first and then pull the "on"
+ * bits high.
  */
 static inline void leds_off(void) {
-	gpio_set(LED_GPIO_PORT, LED_PINS, GPIO_PIN_HIGH);
+	gpio_set(LED_GPIO_PORT, LED_PINS, GPIO_PIN_LOW);
 }
 
 static inline void leds_write(unsigned int value) {
 	unsigned int on = (value & ((1U << LED_COUNT) - 1)) << LED0_PIN;
 
 	leds_off();
-	gpio_set(LED_GPIO_PORT, on & LED_PINS, GPIO_PIN_LOW);
+	gpio_set(LED_GPIO_PORT, on & LED_PINS, GPIO_PIN_HIGH);
 }
 
 static inline void leds_init(void) {

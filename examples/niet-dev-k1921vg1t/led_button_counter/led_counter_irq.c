@@ -3,10 +3,12 @@
  * @brief NIIET-DEV-K1921VG1T: USER button increments a counter shown
  *        in binary on the four LEDs. Interrupt-driven variant.
  *
- * A GPIO interrupt is armed on both edges of the button pin; the
- * handler counts only the edge into the pressed (low) state, which
- * filters most switch bounce. The main loop applies the events in
- * 50 ms windows, which also acts as a simple debounce.
+ * The interrupt is armed on the falling edge only (press = high to
+ * low). A both-edges configuration would latch INTSTATUS while the
+ * button idles high and storm the PLIC (see the board guide).
+ *
+ * The main loop applies the events in 50 ms windows, which also acts
+ * as a simple debounce.
  */
 
 #include <stdio.h>
@@ -34,7 +36,7 @@ int main(int argc, char **argv) {
 
 	gpio_setup_mode(BTN_GPIO_PORT, BTN_PIN,
 			GPIO_MODE_IN | GPIO_MODE_IN_PULL_UP |
-			GPIO_MODE_INT_EN | GPIO_MODE_INT_RISING_FALLING);
+			GPIO_MODE_INT_EN | GPIO_MODE_INT_FALLING);
 
 	if (0 > gpio_irq_attach(BTN_GPIO_PORT, BTN_PIN, btn_irq_hnd, NULL)) {
 		fprintf(stderr, "led_counter_irq: cannot attach GPIO IRQ\n");
