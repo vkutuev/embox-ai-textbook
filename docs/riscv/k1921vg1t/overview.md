@@ -40,9 +40,15 @@ share the same die and identical peripherals; they differ only in the package.
 
 ## Compiler flags
 
+The core implements RV32IMAFDCP (Zicsr, Zifencei). The user manual and the
+NIET quick-start guide recommend:
+
 ```
 -march=rv32imafdcp_zicsr -mabi=ilp32d
 ```
+
+The Embox template for this MCU uses a reduced subset that is sufficient for
+Embox: `-march=rv32imfdc_zicsr_zifencei -mabi=ilp32d` (no A/P).
 
 The core supports machine, supervisor, and user privilege modes, and MMU with
 32-entry ITLB/DTLB plus a 16-entry MPU, so it can run Linux-like systems

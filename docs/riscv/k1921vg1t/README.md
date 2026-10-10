@@ -32,7 +32,7 @@ The most important facts for bringing up Embox on K1921VG1T:
 
 | Concern | Answer |
 | ------- | ------ |
-| ISA flags | `-march=rv32imafdcp_zicsr -mabi=ilp32d` |
+| ISA flags | Embox template: `-march=rv32imfdc_zicsr_zifencei -mabi=ilp32d` (core is RV32IMAFDCP; the vendor recommends `rv32imafdcp_zicsr`) |
 | Boot address | `0x0000_0000` (FlashM) |
 | RAM | 1 MiB SRAM at `0x2000_0000` |
 | Console UART | UART0 at `0x5201_0000` |

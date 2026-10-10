@@ -50,11 +50,14 @@ during reset, then four `SERVCMD` writes via JTAG).
 ## Software
 
 - Toolchain: RISC-V GCC (NIET recommends the xpack `riscv-none-elf-gcc` or
-  Syntacore Development Toolkit). Flags for K1921VG1T:
+  Syntacore Development Toolkit). Vendor-recommended flags for K1921VG1T:
 
   ```
   -march=rv32imafdcp_zicsr -mabi=ilp32d
   ```
+
+  The Embox template uses a reduced subset:
+  `-march=rv32imfdc_zicsr_zifencei -mabi=ilp32d` (see the board guide).
 
 - SDK and examples: NIIET_RISCV SDK —
   <https://gitflic.ru/project/niiet/niiet_riscv_sdk.git> (branch `master`),
