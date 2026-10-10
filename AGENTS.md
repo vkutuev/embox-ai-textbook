@@ -48,9 +48,30 @@ directory exists after a fresh clone.
 - Never cite `.tmp/` as a source in documentation or instructions: always
   cite the canonical upstream source (see "Temporary Files").
 
+## Hardware Bring-Up
+
+When working with real hardware (dev boards, debug adapters, serial
+converters):
+
+- Before the first run and before using a newly connected peripheral or
+  adapter, tell the user the correct way to connect it: the required
+  connection method (signals that must be wired) and the desired one
+  (optional but recommended, e.g. VTref), preferably as a pin-mapping
+  table based on the board documentation.
+- Verify the physical wiring before concluding that hardware is at
+  fault. An observed symptom (e.g. reset not working) is not proof of a
+  board or silicon limitation — check the cable and the connector pinout
+  first and ask the user how the device is connected.
+- Mark observations that depend on a particular setup (adapter model,
+  cable, host OS) as setup-specific in the documentation.
+
 ## Workflow
 
 - Before starting work, read relevant files under `docs/` and this file.
 - When a new decision is made during a session, write it down in the
   appropriate file before the session ends.
+- Record new findings in experiment journals first; move them into the
+  canonical guide only after they are confirmed (ideally by a repeated
+  run). After new facts are established, revise the affected guide
+  sections so stale claims do not remain.
 - Verify changes (spellcheck, consistent formatting) before asking the user to review.

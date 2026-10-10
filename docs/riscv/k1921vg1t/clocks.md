@@ -59,6 +59,16 @@ Configuration sequence (must be done before switching SYSCLK to the PLL):
    working mode (11b), select VCO sub-band (recommended 11b), set `FOUTEN`.
 4. Wait for `LOCK` in `PLLSTAT`.
 
+## CPE pin note
+
+The SDK header comments mention a `CPE` pad that inverts the meaning of
+the HSI/HSE clock-source selects. The user manual does not document CPE
+at all (no pin in the package table), and on real hardware the SIU
+`CPESTAT` register (offset +08h) reads 0, so the selects are not
+inverted on this chip: CLKSEL=1 means HSE (27 MHz on the dev board).
+Treat the SDK header comment as generic; do not rely on it for the
+K1921VG1T.
+
 ## HSI RC oscillator
 
 Internal RC oscillator, nominal 4 MHz. Frequency is tunable via the `TUNE`
