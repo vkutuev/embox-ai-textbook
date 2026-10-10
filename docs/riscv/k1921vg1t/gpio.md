@@ -37,6 +37,17 @@ The Embox `k1921vg1t_dev` template includes
 ports through the standard GPIO API (`src/drivers/gpio/gpio.h`). Board
 usage: [LED/button counter example](КФДЛ.441461.050/example-led-button-counter.md).
 
+## GPIO interrupt quirk (observed on the dev board)
+
+On the dev board, an edge-configured pin whose level keeps the
+condition asserted re-pends the PLIC source faster than the interrupt
+handler clears `INTSTATUS` (write-1-to-clear does not take effect
+immediately), and the RISC-V trap handler nests interrupts during
+dispatch — the result is an unbounded interrupt storm that wedges the
+system. A both-edges configuration on an idle-high pin latches
+`INTSTATUS` at enable and breaks boot. Details and GDB evidence:
+[experiment journal](КФДЛ.441461.050/experiment-led-button-counter.md).
+
 ## Sources
 
 - `doc/K1921VG1T/UM_K1921VG1T_10YA.pdf` in

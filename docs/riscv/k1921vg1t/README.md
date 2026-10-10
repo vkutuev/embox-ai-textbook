@@ -25,7 +25,8 @@ the official user manual, errata, and quick-start guide.
   guide, and experiment records:
   [SDK OpenOCD configurations](КФДЛ.441461.050/experiment-sdk-openocd-configs.md),
   [GDB `load` flash](КФДЛ.441461.050/experiment-gdb-flash.md),
-  [LED/button counter example](КФДЛ.441461.050/example-led-button-counter.md)
+  [LED/button counter example](КФДЛ.441461.050/example-led-button-counter.md),
+  [LED/button counter experiment](КФДЛ.441461.050/experiment-led-button-counter.md)
 
 ## Embox relevance
 
