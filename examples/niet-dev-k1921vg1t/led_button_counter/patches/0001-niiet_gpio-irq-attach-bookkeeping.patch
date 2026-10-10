@@ -1,0 +1,12 @@
+diff --git a/src/drivers/gpio/niiet/niiet_gpio/niiet_gpio.c b/src/drivers/gpio/niiet/niiet_gpio/niiet_gpio.c
+index 3726c0c..890f723 100644
+--- a/src/drivers/gpio/niiet/niiet_gpio/niiet_gpio.c
++++ b/src/drivers/gpio/niiet/niiet_gpio/niiet_gpio.c
+@@ -402,6 +402,7 @@ static int niiet_gpio_setup_irq(int port, uint32_t mask, uint32_t mode) {
+ 		if (res < 0) {
+ 			return res;
+ 		}
++		niiet_gpio_priv.gpio_irq_handler[irq_port] = niiet_gpio_irq_handler;
+ 	}
+ 
+ 	if (mode & GPIO_MODE_INT_EN) {

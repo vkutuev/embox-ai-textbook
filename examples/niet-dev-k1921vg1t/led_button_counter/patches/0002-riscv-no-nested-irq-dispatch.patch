@@ -1,0 +1,19 @@
+diff --git a/src/arch/riscv/kernel/entry/irq_handler.c b/src/arch/riscv/kernel/entry/irq_handler.c
+index 272cbb8..47db940 100644
+--- a/src/arch/riscv/kernel/entry/irq_handler.c
++++ b/src/arch/riscv/kernel/entry/irq_handler.c
+@@ -29,12 +29,12 @@ void riscv_interrupt_handler(void) {
+ 	//irqctrl_eoi(irq);
+ 	critical_enter(CRITICAL_IRQ_HANDLER);
+ 	{
+-		ipl_enable();
++		//ipl_enable();
+ 
+ 		irq_dispatch(irq);
+ 		//irqctrl_eoi(irq);
+ 
+-		ipl_disable();
++		//ipl_disable();
+ 	}
+ 	critical_leave(CRITICAL_IRQ_HANDLER);
+ 
