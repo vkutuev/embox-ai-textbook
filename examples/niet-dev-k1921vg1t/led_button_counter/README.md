@@ -74,12 +74,14 @@ by reading `pin GPIOB 3 get` while pressing.
 
 ## Known issues on this board
 
-- `led_counter_irq` wedges the system on button press (GPIO interrupt
-  storm: the pressed pin re-asserts the line faster than the handler
-  clears `INTSTATUS`, and the RISC-V trap handler nests interrupts
-  during dispatch).
+- `led_counter_irq` is blocked by a GPIO interrupt storm; the root
+  cause is identified: `INTSTATUS` on this silicon cannot be cleared
+  reliably (write-1-to-clear does not work while the edge condition
+  holds), the trap handler nests interrupts during dispatch, and
+  `niiet_gpio` has an IRQ-attach bookkeeping bug. Two patches are in
+  [`patches/`](patches/); even with them the CPU spins while the line
+  stays asserted, so the polling variant remains the recommended one.
 - `led_counter_input` requires the `gpio_button` driver, whose
   both-edges IRQ configuration latches `INTSTATUS` at boot and hangs
   the system at module init.
-- Both issues are board/driver-level, not example-code-level. See the
-  board guide's experiment journal for the full GDB evidence.
+- Full GDB evidence: the board guide's experiment journal.

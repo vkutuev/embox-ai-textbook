@@ -39,13 +39,16 @@ usage: [LED/button counter example](КФДЛ.441461.050/example-led-button-count
 
 ## GPIO interrupt quirk (observed on the dev board)
 
-On the dev board, an edge-configured pin whose level keeps the
-condition asserted re-pends the PLIC source faster than the interrupt
-handler clears `INTSTATUS` (write-1-to-clear does not take effect
-immediately), and the RISC-V trap handler nests interrupts during
-dispatch — the result is an unbounded interrupt storm that wedges the
-system. A both-edges configuration on an idle-high pin latches
-`INTSTATUS` at enable and breaks boot. Details and GDB evidence:
+On the dev board, an edge-configured pin keeps the interrupt line
+asserted: `INTSTATUS` cannot be cleared reliably by the documented
+write-1 while the edge condition holds, so the PLIC source re-pends
+after every claim and the RISC-V trap handler (which nests interrupts
+during dispatch) re-enters without bound, smashing the stack. A
+both-edges configuration on an idle-high pin latches `INTSTATUS` at
+enable and breaks boot. Additionally, the `niiet_gpio` driver never
+records the attached IRQ handler, so repeated `gpio_setup_mode()`
+calls silently disable the interrupt. Details, GDB evidence, and two
+Embox patches:
 [experiment journal](КФДЛ.441461.050/experiment-led-button-counter.md).
 
 ## Sources

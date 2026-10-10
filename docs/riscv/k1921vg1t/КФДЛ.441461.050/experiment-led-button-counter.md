@@ -20,28 +20,41 @@ Hardware verification of the
 `led_counter_poll` increments once per press, prints the value, shows it
 in binary on the LEDs, wraps at 15. Verified with many presses.
 
-### IRQ — wedges the system on press
+### IRQ — blocked by a silicon latch + driver bugs (root cause found)
 
-`led_counter_irq` (falling-edge IRQ) starts fine and idles fine, but a
-button press wedges the system: output freezes (banner truncated
-mid-print), no counter output, and afterwards the shell is permanently
-deaf (UART RX never drained again until reset).
+`led_counter_irq` (falling-edge IRQ) starts fine, but pressing the
+button wedges the system. Follow-up session (same day, with a driver
+fix applied) traced the full chain and found three separate problems:
 
-Observed via JTAG/GDB:
+1. **`niiet_gpio` never records the attached IRQ handler.** The guard
+   `if (NULL == niiet_gpio_priv.gpio_irq_handler[irq_port])` is always
+   true, so every `gpio_setup_mode()` re-runs `irq_attach()`; the
+   second call fails with `-EBUSY` and returns *before* enabling the
+   interrupt. Net effect: after two `gpio_setup_mode()` calls on the
+   same port the pin interrupt is silently masked forever. Fixed with
+   one line (patch `0001`, verified: `INTENSET` now stays set and the
+   interrupt chain works up to the user handler).
+2. **`INTSTATUS` does not clear on this silicon.** While pressed (and
+   even after release), `INTSTATUS` stays latched at `0x8`; neither
+   write-1-to-clear (the UM procedure) nor write-0 clears it. The
+   asserted line keeps re-pending the PLIC, so the trap handler is
+   re-entered forever. GDB evidence: `btn_events` reached 0x40E4A
+   (~266k ISR calls) from a single press, with `INTSTATUS=8` still
+   latched after release.
+3. **The RISC-V trap handler nests interrupts during dispatch**
+   (`ipl_enable()` in `riscv_interrupt_handler()`). With the line
+   permanently asserted, each re-entry pushes a trap context on the
+   interrupted thread's stack — unbounded growth that smashes
+   unrelated kernel state: the UART RX drain thread dies (console
+   dead) and `.data` globals are overwritten (`btn_events` read 0
+   while the ISR demonstrably ran). Patching out the nesting
+   (patch `0002`) bounds the storm: the system survives, the counter
+   counts once, but the CPU spins at 100% while the line is asserted.
 
-- During/after the press: repeated traps with `mcause=0x8000000B`
-  (machine external interrupt), `mepc` at the idle instruction.
-- After release the system partially recovers: `INTSTATUS=0`, PLIC
-  pending shows only the healthy TMR0 source (16), the core runs the
-  idle task and services timer interrupts — but the UART RX interrupt
-  (PLIC source 64) stays asserted (`MIS=0x50`, `DR` unread) and the RX
-  drain thread never runs, so the console is dead.
-- The pressed pin re-asserts the GPIO line faster than the interrupt
-  handler clears it: `INTSTATUS` write-1-to-clear does not take effect
-  immediately on this silicon (see below), and
-  `riscv_interrupt_handler()` enables interrupts during dispatch
-  (`ipl_enable()`), so the storm nests without bound and corrupts the
-  RX thread's state.
+Conclusion: the polling variant is the verified one. Interrupt-driven
+buttons on this board need the two patches *plus* an understanding of
+the `INTSTATUS` latch behavior (NIIET errata/manual); the patches are
+in `examples/.../led_button_counter/patches/`.
 
 ### Input subsystem (gpio_button) — breaks every boot
 
@@ -59,16 +72,20 @@ claimed externally (a GDB read of the PLIC claim register
 - The GPIO `INTSTATUS` flag is set by the edge configuration itself
   and is independent of `INTENSET` (UM chapter 15); in both-edges mode
   `INTPOLSET` is ignored.
-- Writing 1 to `INTSTATUS` should clear the flag (UM), but on this
-  silicon the clear does not take effect immediately in the tested
-  modes, so an asserted line keeps re-pending the PLIC source.
+- On this silicon `INTSTATUS` cannot be cleared reliably by the
+  documented write-1 while the edge configuration keeps the condition
+  asserted — the interrupt line stays asserted and re-pends the PLIC
+  after every claim (observed in both-edges and falling-edge modes).
 - The RISC-V trap handler nests interrupts during dispatch. A
-  re-asserting GPIO line therefore causes unbounded nesting and
-  corrupts unrelated kernel state (the UART RX drain lthread).
+  permanently-asserted GPIO line therefore causes unbounded nesting
+  and corrupts unrelated kernel state (the UART RX drain lthread).
+- `niiet_gpio` has a bookkeeping bug (missing
+  `gpio_irq_handler[port]` assignment) that makes repeated
+  `gpio_setup_mode()` calls silently disable the interrupt.
 - Consequences for the textbook: the polling variant is the verified
-  one. Making the IRQ/input variants work needs driver fixes
-  (immediate INTSTATUS clearing, no nested dispatch), not example-code
-  changes.
+  one. Making the IRQ/input variants work needs the two patches in
+  `examples/.../led_button_counter/patches/` plus a silicon-level
+  understanding of the `INTSTATUS` latch.
 
 ## Environment notes
 

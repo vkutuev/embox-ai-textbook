@@ -56,7 +56,7 @@ The example exists in three forms, all in
 | Variant | Command | How the button is read | Status |
 | ------- | ------- | ---------------------- | ------ |
 | Polling | `led_counter_poll` | `gpio_get()` in a 10 ms loop with software debounce | **verified** |
-| Interrupt | `led_counter_irq` | GPIO interrupt on the falling edge (press); main loop applies events | wedges on press, see below |
+| Interrupt | `led_counter_irq` | GPIO interrupt on the falling edge (press); main loop applies events | root cause found, needs driver patches — see below |
 | Input subsystem | `led_counter_input` | reads `struct input_event` from `/dev/input/user-bt` produced by the `gpio_button` driver | breaks boot, see below |
 
 Comparison:
@@ -64,10 +64,15 @@ Comparison:
 - **Polling** is the simplest to read and debug and cannot lose the
   CPU to a noisy pin; it wastes a little CPU time. Verified working.
 - **Interrupt** shows the RTOS/IRQ path and does not poll. On this
-  board it is currently unusable: the pressed pin re-asserts the GPIO
-  line faster than the interrupt handler clears it, the RISC-V trap
-  handler nests interrupts during dispatch, and the resulting storm
-  corrupts unrelated kernel state (the console dies). See the
+  board it is currently unusable; the root cause is identified and
+  two Embox patches are provided in
+  [`examples/.../led_button_counter/patches/`](../../../../examples/niet-dev-k1921vg1t/led_button_counter/patches/):
+  (1) `niiet_gpio` never records the attached IRQ handler, so repeated
+  `gpio_setup_mode()` calls fail with `-EBUSY` and silently disable
+  the interrupt; (2) the RISC-V trap handler nests interrupts during
+  dispatch, so a permanently-asserted GPIO line smashes the stack.
+  Even with both patches the `INTSTATUS` latch on this silicon keeps
+  the line asserted, so the CPU spins while pressed. See the
   [experiment journal](experiment-led-button-counter.md).
 - **Input subsystem** is the most idiomatic Embox approach, but
   `gpio_button` configures a both-edges interrupt on the idle-high
