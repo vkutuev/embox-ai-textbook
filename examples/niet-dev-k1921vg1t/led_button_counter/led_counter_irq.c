@@ -66,6 +66,10 @@ int main(int argc, char **argv) {
 			GPIO_MODE_IN | GPIO_MODE_IN_PULL_UP |
 			GPIO_MODE_INT_FALLING);
 
+	/* Drop a stale registration from a previous run of this command:
+	 * gpio_irq_attach() fails with -EBUSY if one is still present. */
+	gpio_irq_detach(BTN_GPIO_PORT, BTN_PIN);
+
 	if (0 > gpio_irq_attach(BTN_GPIO_PORT, BTN_PIN, btn_irq_hnd, NULL)) {
 		fprintf(stderr, "led_counter_irq: cannot attach GPIO IRQ\n");
 		return -1;
