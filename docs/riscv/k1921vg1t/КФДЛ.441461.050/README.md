@@ -136,11 +136,11 @@ Diagnostic helpers:
 ## Examples
 
 - [LED/button counter](example-led-button-counter.md) — USER button
-  increments a counter shown in binary on the four LEDs; three variants
-  (polling, GPIO interrupt, input subsystem), sources in
+  increments a counter shown in binary on the four LEDs (board LED1–LED4);
+  three variants (polling, GPIO interrupt, input subsystem), sources in
   [examples/niet-dev-k1921vg1t/led_button_counter/](../../../../examples/niet-dev-k1921vg1t/led_button_counter/).
-  The polling variant is verified on hardware; the IRQ and input
-  variants hit a GPIO interrupt quirk — see the
+  Polling and IRQ variants are verified on hardware; the input variant
+  hits a GPIO interrupt quirk — see the
   [experiment journal](experiment-led-button-counter.md).
 
 ## Flashing in dualcore mode (SRV-ON jumper)

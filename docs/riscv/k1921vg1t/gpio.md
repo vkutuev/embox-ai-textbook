@@ -39,16 +39,20 @@ usage: [LED/button counter example](КФДЛ.441461.050/example-led-button-count
 
 ## GPIO interrupt quirk (observed on the dev board)
 
-On the dev board, an edge-configured pin keeps the interrupt line
-asserted: `INTSTATUS` cannot be cleared reliably by the documented
-write-1 while the edge condition holds, so the PLIC source re-pends
-after every claim and the RISC-V trap handler (which nests interrupts
-during dispatch) re-enters without bound, smashing the stack. A
-both-edges configuration on an idle-high pin latches `INTSTATUS` at
-enable and breaks boot. Additionally, the `niiet_gpio` driver never
-records the attached IRQ handler, so repeated `gpio_setup_mode()`
-calls silently disable the interrupt. Details, GDB evidence, and two
-Embox patches:
+On the dev board, writing the GPIO edge-configuration registers
+(`INTTYPESET`/`INTEDGECLR`/`INTPOLCLR`) latches a spurious `INTSTATUS`
+bit; with the interrupt enabled, that keeps the line asserted and the
+PLIC re-pends after every claim — an interrupt storm (the RISC-V trap
+handler, which nests interrupts during dispatch, then smashes the
+stack). A both-edges configuration on an idle-high pin latches at
+enable and breaks boot. `INTSTATUS` write-1-to-clear itself works (per
+the UM); the trigger is the configuration write.
+
+The workaround: configure the interrupt once, then mask/clear/re-arm by
+writing only `INTENCLR`/`INTSTATUS`/`INTENSET` — never re-run
+`gpio_setup_mode()`. Additionally, the `niiet_gpio` driver never records
+the attached IRQ handler, so repeated `gpio_setup_mode()` calls silently
+disable the interrupt. Details, GDB evidence, and a driver patch:
 [experiment journal](КФДЛ.441461.050/experiment-led-button-counter.md).
 
 ## Sources
