@@ -1,10 +1,31 @@
-# Patches for GPIO interrupt support on K1921VG1T
+# GPIO interrupt support on K1921VG1T
 
-Two Embox patches discovered while verifying the IRQ variant of the
-LED/button counter example on the NIIET-DEV-K1921VG1T board
-(2026-10-10). Full evidence: the board guide's experiment journal.
+Findings from verifying the IRQ variant of the LED/button counter
+example on the NIIET-DEV-K1921VG1T board (2026-10-10 / 2026-10-12).
+Full evidence: the board guide's experiment journal.
 
-## 0001 — niiet_gpio: record the attached IRQ handler
+## The working recipe
+
+The IRQ variant now works (verified: five consecutive presses →
+`counter = 1..5`, no interrupt storm, console stays alive). The key is
+**not to re-run the driver's `gpio_setup_mode()`** once the interrupt
+is configured: every such call re-writes the edge-configuration
+registers (`INTTYPESET`/`INTEDGECLR`/`INTPOLCLR`), which latches a
+spurious `INTSTATUS` bit on this silicon. With `INTSTATUS` set and the
+interrupt enabled, the line stays asserted and the PLIC re-pends after
+every claim — an interrupt storm.
+
+Instead, mask, clear, and re-arm by writing only the GPIO interrupt
+registers directly (see `led_counter_irq.c`):
+
+- mask   → `GPIOB_INTENCLR = pin`
+- clear  → `GPIOB_INTSTATUS = pin` (write-1-to-clear, per the UM)
+- re-arm → clear `INTSTATUS`, then `GPIOB_INTENSET = pin`
+
+This never touches the edge-configuration registers, so no spurious
+latch occurs.
+
+## 0001 — niiet_gpio: record the attached IRQ handler (real driver bug)
 
 `niiet_gpio_setup_irq()` checks `niiet_gpio_priv.gpio_irq_handler[port]`
 to decide whether the PLIC IRQ is already attached, but the array is
@@ -12,29 +33,16 @@ never filled in. Every `gpio_setup_mode()` call therefore re-runs
 `irq_attach()`, which fails with `-EBUSY`, and the function returns
 *before* enabling the interrupt — silently leaving the pin masked.
 
-Symptom: after any second `gpio_setup_mode()` on the same port, the
-GPIO interrupt never fires (`INTENSET` stays clear), even though the
-pin, `INTSTATUS`, and the PLIC all look fine.
+This patch fixes that. It is not strictly required by the example above
+(which calls `gpio_setup_mode()` once), but it is a real bug that bites
+any code that configures the same GPIO port more than once (e.g. the
+`gpio_button` driver).
 
-## 0002 — riscv: do not nest interrupt dispatch
+## PLIC start/end handshake (debugging note)
 
-`riscv_interrupt_handler()` calls `ipl_enable()` around
-`irq_dispatch()`. When an asserted GPIO line re-pends the PLIC faster
-than the handler clears it, every re-entry pushes another trap context
-on the interrupted thread's stack. With the K1921VG1T GPIO quirk
-(`INTSTATUS` stays latched), nesting is unbounded and the stack
-smashes unrelated kernel state (the UART RX drain thread and `.data`
-globals), killing the console.
-
-Disabling the nested dispatch bounds the storm: the system survives a
-button press (the counter still counts), though it spins at 100% while
-the line stays asserted.
-
-## Known remaining issue
-
-Neither patch fixes the underlying latch: on this silicon,
-`INTSTATUS` cannot be cleared reliably by the documented write-1 while
-the edge configuration keeps the condition asserted, so the interrupt
-line stays asserted and the CPU keeps servicing it. Until that is
-understood (NIIET errata/manual), interrupt-driven buttons on this
-board remain unusable; use the polling variant.
+The claim register (`0xFE200004`) uses a start/end protocol: reading it
+"starts" the interrupt and holds the target's EIP low until a write of
+the same value ("end") completes it. Reading it from a debugger without
+the matching write leaves the target unable to take further external
+interrupts. The Embox handler writes the "end" (`irqctrl_eoi`), so this
+only matters when poking the register manually.

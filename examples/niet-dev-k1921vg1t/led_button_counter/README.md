@@ -4,26 +4,25 @@ An Embox example for the КФДЛ.441461.050 (NIIET-DEV-K1921VG1T) board:
 press the USER button and the counter increments; the four LEDs show
 the counter value in binary (0..15, wraps around).
 
-> **Status (2026-10-10): LED and button polarity verified on
-> hardware** (GPIOC 12–15 = LED0–3, active-high; GPIOB 3 = USER,
-> press = low). The **polling variant is verified working**. The IRQ
-> and input variants hit a GPIO interrupt quirk on this board
-> (interrupt storm on press / at boot) — see the board guide and the
-> experiment journal.
+> **Status (2026-10-12): verified on hardware.** LEDs LED1–LED4 on
+> GPIOC12–15 (active-high), USER button on GPIOB3 (press = low). Both
+> the **polling** and **IRQ** variants work (five presses → `counter =
+> 1..5`). The input variant still hits a GPIO interrupt quirk at boot.
 
 ## Board resources
 
 | Signal | Pin | Notes |
 | ------ | --- | ----- |
 | USER button | GPIOB[3] | verified: high when released, low while pressed |
-| LED0..LED3 | GPIOC[12..15] | **verified: active-high** (pin high = LED on) |
+| LED1..LED4 | GPIOC[12..15] | **verified: active-high** (pin high = LED on) |
 
 The pin mapping is from the SDK BSP
 (`hardware/bsp/NIIET-DEV-K1921VG1T/bsp.h`, `bsp.c`). Note the BSP's
 `BSP_LED_On()` clears `DATAOUT` bits, which implies active-low — but
 on the real board the LEDs are active-high (verified with the `pin`
-command). The button init in the BSP is a TODO; polarity was verified
-by reading `pin GPIOB 3 get` while pressing.
+command). The board silkscreen labels the LEDs LED1–LED4 (GPIOC12 =
+LED1, … GPIOC15 = LED4). The button init in the BSP is a TODO;
+polarity was verified by reading `pin GPIOB 3 get` while pressing.
 
 ## Files
 
@@ -58,7 +57,7 @@ by reading `pin GPIOB 3 get` while pressing.
 
 - On start: all LEDs off, `counter = 0`.
 - Each press: counter increments by 1, the value is shown in binary
-  on the LEDs (LED0 = bit 0) and printed to the console.
+  on the LEDs (LED1 = bit 0) and printed to the console.
 - After 15 the counter wraps to 0.
 - Exit with Ctrl+C if the shell supports it; otherwise reboot.
 
@@ -74,14 +73,15 @@ by reading `pin GPIOB 3 get` while pressing.
 
 ## Known issues on this board
 
-- `led_counter_irq` is blocked by a GPIO interrupt storm; the root
-  cause is identified: `INTSTATUS` on this silicon cannot be cleared
-  reliably (write-1-to-clear does not work while the edge condition
-  holds), the trap handler nests interrupts during dispatch, and
-  `niiet_gpio` has an IRQ-attach bookkeeping bug. Two patches are in
-  [`patches/`](patches/); even with them the CPU spins while the line
-  stays asserted, so the polling variant remains the recommended one.
+- `led_counter_irq` works, but **do not re-run `gpio_setup_mode()`**
+  on the button port after configuration: each call re-writes the
+  edge-configuration registers and latches a spurious `INTSTATUS` on
+  this silicon, storming the PLIC. The example masks/clears/re-arms
+  via the `INTENCLR`/`INTSTATUS`/`INTENSET` registers directly (see
+  [`patches/`](patches/)).
 - `led_counter_input` requires the `gpio_button` driver, whose
   both-edges IRQ configuration latches `INTSTATUS` at boot and hangs
   the system at module init.
+- `niiet_gpio` has an IRQ-attach bookkeeping bug (never records the
+  attached handler) — see `patches/0001`.
 - Full GDB evidence: the board guide's experiment journal.

@@ -5,10 +5,10 @@
  *
  * Board resources, per the NIIET SDK BSP
  * (hardware/bsp/NIIET-DEV-K1921VG1T/bsp.h), verified on hardware:
- *  - LEDs LED0..LED3 on GPIOC pins 12..15, active-high:
- *    driving a pin high lights the LED. (The SDK BSP code implies the
- *    opposite — BSP_LED_On() clears the output bit — but active-high
- *    was confirmed empirically on this board.)
+ *  - LEDs LED1..LED4 (board silkscreen) on GPIOC pins 12..15,
+ *    active-high: driving a pin high lights the LED. (The SDK BSP code
+ *    implies the opposite — BSP_LED_On() clears the output bit — but
+ *    active-high was confirmed empirically on this board.)
  *  - USER button on GPIOB pin 3, active-low: the pin reads high when
  *    released and low while pressed.
  *
@@ -21,8 +21,8 @@
 #include <drivers/gpio.h>
 
 #define LED_GPIO_PORT   GPIO_PORT_C
-#define LED0_PIN        12
-#define LED_PINS        (0xF << LED0_PIN)
+#define LED1_PIN        12
+#define LED_PINS        (0xF << LED1_PIN)
 #define LED_COUNT       4
 
 #define BTN_GPIO_PORT   GPIO_PORT_B
@@ -38,7 +38,7 @@ static inline void leds_off(void) {
 }
 
 static inline void leds_write(unsigned int value) {
-	unsigned int on = (value & ((1U << LED_COUNT) - 1)) << LED0_PIN;
+	unsigned int on = (value & ((1U << LED_COUNT) - 1)) << LED1_PIN;
 
 	leds_off();
 	gpio_set(LED_GPIO_PORT, on & LED_PINS, GPIO_PIN_HIGH);

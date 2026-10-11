@@ -1,16 +1,19 @@
 /**
  * @file
  * @brief NIIET-DEV-K1921VG1T: USER button increments a counter shown
- *        in binary on the four LEDs. Interrupt-driven variant.
+ *        in binary on the four LEDs (board labels LED1..LED4).
+ *        Interrupt-driven variant.
  *
  * The interrupt is armed on the falling edge only (press = high to
- * low). A both-edges configuration would latch INTSTATUS while the
- * button idles high and storm the PLIC (see the board guide).
+ * low). Masking and re-arming write only the GPIOB INTENCLR/INTENSET
+ * and INTSTATUS registers directly; they do NOT re-run the driver's
+ * gpio_setup_mode(), whose edge-configuration writes re-latch
+ * INTSTATUS on this silicon and cause an interrupt storm (see the
+ * board guide).
  *
- * To survive contact bounce, the handler masks the pin interrupt
- * immediately; the main loop debounces, waits for the release, and
- * only then re-arms the interrupt. This makes each press count
- * exactly once and prevents interrupt storms.
+ * Each press: the ISR masks the pin and records the event; the main
+ * loop counts, debounces, waits for the release, then clears the
+ * status and re-arms. This makes every press count exactly once.
  */
 
 #include <stdio.h>
@@ -20,14 +23,35 @@
 
 #include "board.h"
 
-#define DEBOUNCE_MS      50
-#define RELEASE_TIMEOUT  2000
+#define GPIOB_BASE      0x40001000UL
+#define GPIOB_INTSTATUS (GPIOB_BASE + 0x80)
+#define GPIOB_INTENSET  (GPIOB_BASE + 0x60)
+#define GPIOB_INTENCLR  (GPIOB_BASE + 0x64)
+
+#define BTN_INT_MASK    BTN_PIN
+
+#define DEBOUNCE_MS     50
+#define RELEASE_TIMEOUT 2000
 
 static volatile unsigned int btn_events;
 
+static inline void btn_irq_mask(void) {
+	*(volatile unsigned int *)GPIOB_INTENCLR = BTN_INT_MASK;
+}
+
+static inline void btn_irq_clear(void) {
+	*(volatile unsigned int *)GPIOB_INTSTATUS = BTN_INT_MASK;
+}
+
+static inline void btn_irq_arm(void) {
+	btn_irq_clear();
+	*(volatile unsigned int *)GPIOB_INTENSET = BTN_INT_MASK;
+}
+
 static int btn_irq_hnd(unsigned int irq_nr, void *data) {
 	btn_events++;
-	gpio_setup_mode(BTN_GPIO_PORT, BTN_PIN, GPIO_MODE_INT_SECTION);
+	btn_irq_mask();
+	btn_irq_clear();
 
 	return 0;
 }
@@ -47,8 +71,7 @@ int main(int argc, char **argv) {
 		return -1;
 	}
 
-	gpio_setup_mode(BTN_GPIO_PORT, BTN_PIN,
-			GPIO_MODE_INT_EN | GPIO_MODE_INT_FALLING);
+	btn_irq_arm();
 
 	printf("led_counter_irq: press USER to count (Ctrl+C to stop)\n");
 	leds_write(counter);
@@ -67,26 +90,18 @@ int main(int argc, char **argv) {
 		usleep(DEBOUNCE_MS * 1000);
 
 		{
-			int released = 0;
 			unsigned int waited = 0;
 
 			while (waited < RELEASE_TIMEOUT) {
 				if (gpio_get(BTN_GPIO_PORT, BTN_PIN) & BTN_PIN) {
-					released = 1;
 					break;
 				}
 				usleep(10 * 1000);
 				waited += 10;
 			}
-
-			if (!released) {
-				printf("still pressed, waiting for release\n");
-				continue;
-			}
 		}
 
-		gpio_setup_mode(BTN_GPIO_PORT, BTN_PIN,
-				GPIO_MODE_INT_EN | GPIO_MODE_INT_FALLING);
+		btn_irq_arm();
 	}
 
 	return 0;
