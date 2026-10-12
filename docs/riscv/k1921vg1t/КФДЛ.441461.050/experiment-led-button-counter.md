@@ -20,46 +20,40 @@ Hardware verification of the
 `led_counter_poll` increments once per press, prints the value, shows it
 in binary on the LEDs, wraps at 15. Verified with many presses.
 
-### IRQ — works, after finding the latch trigger (2026-10-12)
+### IRQ — works (2026-10-12)
 
-First version wedged the system on press. The investigation found a
-chain of issues; the decisive one is a **spurious `INTSTATUS` latch
-caused by re-running the driver's configuration**:
+First versions wedged the system on press. Two concrete issues were
+found; the exact storm trigger remains partially open (below):
 
 1. **`niiet_gpio` never records the attached IRQ handler.** The guard
    `if (NULL == niiet_gpio_priv.gpio_irq_handler[irq_port])` is always
    true, so every `gpio_setup_mode()` re-runs `irq_attach()`; the
    second call fails with `-EBUSY` and returns *before* enabling the
-   interrupt. Net effect: after two `gpio_setup_mode()` calls on the
-   same port the pin interrupt is silently masked forever. Fixed with
-   one line (patch `0001`).
-2. **Every `gpio_setup_mode()` re-writes the edge-configuration
-   registers** (`INTTYPESET`/`INTEDGECLR`/`INTPOLCLR`), which latches a
-   spurious `INTSTATUS` on this silicon. With the interrupt enabled,
-   `INTSTATUS` set means the line stays asserted and the PLIC re-pends
-   after every claim — an interrupt storm. An earlier ISR that masked
-   via `gpio_setup_mode()` therefore *fed* the storm: GDB showed
-   `btn_events` reach 0x40E4A (~266k ISR calls) from one press, and the
-   stack growth zeroed `.data` globals (`btn_events` read 0 while the
-   ISR demonstrably ran).
-3. The RISC-V trap handler nests interrupts during dispatch
-   (`ipl_enable()`), which turned the storm into stack corruption (dead
-   UART RX thread = dead console). This is an amplifier, not the
-   trigger: with the latch eliminated, the stock handler is fine.
+   interrupt — the pin interrupt is silently masked. Fixed with one
+   line (patch `0001`, verified with `niiet_gpio_check`).
+2. **Interrupt storm on press.** Repeated presses produced an unbounded
+   storm: GDB showed `btn_events` reach 0x40E4A (~266k ISR calls) from
+   one press, and the stack growth zeroed `.data` globals (dead UART RX
+   thread = dead console).
 
-**Fix** (in `led_counter_irq.c`): after the initial configuration, never
-call `gpio_setup_mode()` again. Mask, clear, and re-arm by writing only
-the GPIO interrupt registers directly — `INTENCLR`, `INTSTATUS`
-(write-1-to-clear, which works per the UM), then `INTENSET`. This never
-touches the edge-configuration registers, so no spurious latch.
+**Fix** (in `led_counter_irq.c`): mask the pin on the first edge
+(`INTENCLR`), then debounce and re-arm (`INTSTATUS` clear + `INTENSET`)
+in the main loop. The interrupt never re-enters, so the storm is
+prevented regardless of its exact trigger. Verified: five consecutive
+presses → `counter = 1..5`, no storm, console alive.
 
-**Verified**: five consecutive presses → `counter = 1..5`, no storm,
-console alive, interrupt re-armed between presses.
-
-> Note: an intermediate conclusion "`INTSTATUS` write-1-to-clear does
-> not work on this silicon" was wrong — those observations were the
-> configuration-write re-latch (and some failed debug-module writes).
-> The UM's write-1-to-clear is correct.
+**Storm mechanism — not fully isolated.** An early hypothesis — that
+re-running `gpio_setup_mode()` re-writes the edge-configuration
+registers and latches a spurious `INTSTATUS` — was tested with a
+register-level probe (writing `INTTYPESET`/`INTEDGECLR`/`INTPOLCLR`/
+`INTENSET`/`INTENCLR` individually, pin high and low) and **not
+reproduced**: no write latched `INTSTATUS`, and `INTSTATUS`
+write-1-to-clear works per the UM. The leading remaining explanation is
+button bounce generating many edges, amplified by the RISC-V trap
+handler's nested dispatch (`ipl_enable()`), which overflows the
+interrupted thread's stack. That is an Embox core issue, not a
+`niiet_gpio` config bug, and the mask-on-first-edge workaround sidesteps
+it.
 
 ### Input subsystem (gpio_button) — breaks every boot
 
@@ -76,16 +70,21 @@ driver change (re-arm on a timer) — not done yet.
 
 ## Root cause notes
 
-- The GPIO `INTSTATUS` flag is set by the edge configuration and is
-  independent of `INTENSET` (UM chapter 15); in both-edges mode
-  `INTPOLSET` is ignored. Writing 1 clears the flag (UM); the flag is
-  not auto-cleared.
-- On this silicon, writing the edge-configuration registers latches a
-  spurious `INTSTATUS`; a both-edges configuration on an idle-high pin
-  latches at enable (the `gpio_button` boot storm).
-- The RISC-V trap handler nests interrupts during dispatch. A
-  permanently-asserted GPIO line therefore causes unbounded nesting and
-  corrupts unrelated kernel state (the UART RX drain lthread).
+- The GPIO `INTSTATUS` flag is set by the edge logic and is independent
+  of `INTENSET` (UM chapter 15); in both-edges mode `INTPOLSET` is
+  ignored. Writing 1 clears the flag (UM); the flag is not auto-cleared.
+- A register-level probe showed that writing the edge-configuration
+  registers (`INTTYPESET`/`INTEDGECLR`/`INTPOLCLR`) or the enable/mask
+  registers does **not** latch `INTSTATUS` on its own — the earlier
+  "re-config latch" hypothesis was not confirmed. The storm on a pressed
+  button is best explained by bounce + the trap handler's nested
+  dispatch (see above).
+- The `gpio_button` boot storm is a separate, still-unexplained case: a
+  both-edges configuration on an idle-high pin latches `INTSTATUS` at
+  enable.
+- The RISC-V trap handler nests interrupts during dispatch. With a
+  re-asserting line (or a burst of bounce edges), this nests without
+  bound and corrupts unrelated kernel state (the UART RX drain lthread).
 - `niiet_gpio` has a bookkeeping bug (missing
   `gpio_irq_handler[port]` assignment) that makes repeated
   `gpio_setup_mode()` calls silently disable the interrupt.

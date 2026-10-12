@@ -7,23 +7,23 @@ Full evidence: the board guide's experiment journal.
 ## The working recipe
 
 The IRQ variant now works (verified: five consecutive presses →
-`counter = 1..5`, no interrupt storm, console stays alive). The key is
-**not to re-run the driver's `gpio_setup_mode()`** once the interrupt
-is configured: every such call re-writes the edge-configuration
-registers (`INTTYPESET`/`INTEDGECLR`/`INTPOLCLR`), which latches a
-spurious `INTSTATUS` bit on this silicon. With `INTSTATUS` set and the
-interrupt enabled, the line stays asserted and the PLIC re-pends after
-every claim — an interrupt storm.
+`counter = 1..5`, no interrupt storm, console stays alive). The recipe is
+to mask the pin on the first edge and never let the interrupt re-enter
+during a burst of button bounce.
 
-Instead, mask, clear, and re-arm by writing only the GPIO interrupt
-registers directly (see `led_counter_irq.c`):
+Mask, clear, and re-arm by writing only the GPIO interrupt registers
+directly (see `led_counter_irq.c`):
 
 - mask   → `GPIOB_INTENCLR = pin`
 - clear  → `GPIOB_INTSTATUS = pin` (write-1-to-clear, per the UM)
 - re-arm → clear `INTSTATUS`, then `GPIOB_INTENSET = pin`
 
-This never touches the edge-configuration registers, so no spurious
-latch occurs.
+An earlier hypothesis — that re-running `gpio_setup_mode()` latches a
+spurious `INTSTATUS` by re-writing the edge-configuration registers —
+was tested with a register-level probe and **not reproduced**: those
+writes do not latch `INTSTATUS` on their own. The storm is best
+explained by button bounce amplified by the RISC-V trap handler's nested
+dispatch; masking on the first edge sidesteps it regardless.
 
 ## 0001 — niiet_gpio: record the attached IRQ handler (real driver bug)
 

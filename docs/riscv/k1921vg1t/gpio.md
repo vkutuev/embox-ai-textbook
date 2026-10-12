@@ -37,23 +37,26 @@ The Embox `k1921vg1t_dev` template includes
 ports through the standard GPIO API (`src/drivers/gpio/gpio.h`). Board
 usage: [LED/button counter example](КФДЛ.441461.050/example-led-button-counter.md).
 
-## GPIO interrupt quirk (observed on the dev board)
+## GPIO interrupt notes (observed on the dev board)
 
-On the dev board, writing the GPIO edge-configuration registers
-(`INTTYPESET`/`INTEDGECLR`/`INTPOLCLR`) latches a spurious `INTSTATUS`
-bit; with the interrupt enabled, that keeps the line asserted and the
-PLIC re-pends after every claim — an interrupt storm (the RISC-V trap
-handler, which nests interrupts during dispatch, then smashes the
-stack). A both-edges configuration on an idle-high pin latches at
-enable and breaks boot. `INTSTATUS` write-1-to-clear itself works (per
-the UM); the trigger is the configuration write.
+The `niiet_gpio` driver never records the attached IRQ handler
+(`gpio_irq_handler[port]` is checked but never written), so a second
+`gpio_setup_mode()` call on the same port re-runs `irq_attach()`, fails
+with `-EBUSY`, and returns before enabling the interrupt — silently
+masking it. Fixed by one line (see the
+[experiment journal](КФДЛ.441461.050/experiment-led-button-counter.md)).
 
-The workaround: configure the interrupt once, then mask/clear/re-arm by
-writing only `INTENCLR`/`INTSTATUS`/`INTENSET` — never re-run
-`gpio_setup_mode()`. Additionally, the `niiet_gpio` driver never records
-the attached IRQ handler, so repeated `gpio_setup_mode()` calls silently
-disable the interrupt. Details, GDB evidence, and a driver patch:
-[experiment journal](КФДЛ.441461.050/experiment-led-button-counter.md).
+An interrupt-driven button also produced an interrupt storm on press.
+An early "re-config latch" hypothesis (that re-writing the edge-config
+registers latches `INTSTATUS`) was tested with a register-level probe
+and **not reproduced**: individual writes to `INTTYPESET`/`INTEDGECLR`/
+`INTPOLCLR`/`INTENSET`/`INTENCLR` do not latch `INTSTATUS`, and
+`INTSTATUS` write-1-to-clear works per the UM. The leading explanation
+for the storm is button bounce amplified by the RISC-V trap handler's
+nested dispatch (`ipl_enable()`). The workaround — mask the pin on the
+first edge (`INTENCLR`), then clear `INTSTATUS` and re-arm `INTENSET` —
+is verified to work. A both-edges configuration on an idle-high pin
+(the `gpio_button` boot storm) is a separate, still-unexplained case.
 
 ## Sources
 
