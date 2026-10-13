@@ -6,35 +6,50 @@ Hardware verification of the
 
 ## Results
 
-| Variant | Result | Notes |
-| ------- | ------ | ----- |
-| `blink_tmr` | **verified** — LED1 blinks at ~1 Hz | timer IRQ path works; CPU idle between interrupts |
-| `blink_busy` | **verified** — LED1 blinks at ~1 Hz | `DELAY_ITERATIONS = 10000000` ≈ 500 ms at the 60 MHz clock |
+| Variant | Result |
+| ------- | ------ |
+| `blink_tmr` | **verified** — 10 blinks ≈ 10 s (exactly 1 Hz) |
+| `blink_busy` | **verified** — 10 blinks ≈ 10 s (self-calibrated 1 Hz) |
 
-Both worked on the first flash. The ~1 Hz observation confirms the whole
-timer chain: 60 MHz SYSCLK, `PERIOD = 29999999` → 2 Hz period interrupt,
-`CTRL.MODE=1`, IRQ 17, and the `IC` clear in the handler.
+## Key finding: the clock is ~189 MHz, not 60 MHz
 
-## Findings
+The initial build assumed the 60 MHz system clock documented earlier.
+The blink came out ~3× too fast, so the clock was re-measured:
 
-- **TMR1 is the right unit**: TMR0 is Embox's `jiffies` source. TMR1 at
-  `0x51009000` is free; enabling it (RCU clock + reset release + SIU
-  `TMREN`) does not disturb the system clock tick.
-- **The timer interrupt is safe** on this board, unlike the GPIO
-  interrupt: it shares the PLIC path with the clock tick (source 16 for
-  TMR0, source 17 for TMR1) and there is no latch quirk.
-- **Handler return type**: Embox `irq_attach()` expects an
-  `irq_return_t (*)(unsigned int, void *)` handler returning
-  `IRQ_HANDLED` — an `int`-returning handler fails to compile
-  (`-Wincompatible-pointer-types`). Fixed in `blink_tmr.c`.
-- The busy-wait `DELAY_ITERATIONS` guess (10 000 000 `nop`s) happened to
-  land near 500 ms on this part; it remains a rough, CPU-bound timing
-  method and will drift with clock/compiler changes, unlike the timer.
+- `mcycle` CSR advanced ~450M per ~2.4 s → **~187–190 MHz**.
+- TMR1 `COUNT` advanced ~451M per ~2.4 s → **~188 MHz** (same clock).
+- `blink_tmr` with `PERIOD = 189 MHz / 2 − 1` gave exactly 1 Hz, and
+  `blink_busy` calibrated against `usleep()` gave exactly 1 Hz.
+
+So the actual core/timer clock is **~189 MHz = 27 MHz HSE × 7**. The
+RCU driver's PLL configuration (NDIV=100, RDIV=2, DIV1A=4, DIV1B=2) is
+*intended* for 60 MHz per its own comment (`//FOUT = 60 000 000 Hz from
+27 MHz HSE`), so the measured value does not match the driver's intent
+— an open discrepancy worth reporting to Embox / investigating in the
+PLL divider semantics. The earlier "60 MHz" note in this repo was wrong
+and has been corrected.
+
+## Other findings
+
+- **`TMR_CTRL.MODE=0` is "Timer Stopped"**, not free-running. A
+  calibration that set `MODE=0` saw the counter frozen at 0. Setting
+  `MODE=1` ("count up") with a large `PERIOD` and the `CLR` bit resets
+  and starts the counter. This is why the first self-calibration attempt
+  measured `delta = 0`.
+- **`irq_attach()` re-run leaks**: after Ctrl+C, the IRQ stays in the
+  kernel IRQ table; a second `blink_tmr` run failed with "cannot attach
+  TMR1 IRQ". Fixed by `irq_detach(TMR1_IRQ, NULL)` before attaching
+  (same pattern as the LED/button IRQ example).
+- **Handler return type**: Embox `irq_attach()` wants an
+  `irq_return_t`-returning handler (`IRQ_HANDLED`); an `int` handler
+  fails to compile.
+- **Self-calibration approach** (final): `blink_busy` measures TMR1
+  `COUNT` against `usleep(200000)` to get ticks/ms, then measures the
+  delay loop to get ticks/iteration, and computes the iteration count
+  for 500 ms — no hard-coded clock. Robust to the unknown PLL state.
 
 ## Environment notes
 
-- `.tmp/embox` `conf/mods.conf` had a stale live
-  `gpio_button(pin_port=1, pin_num=3)` include (which breaks boot) and
-  had lost the LED-counter includes; it was trimmed to just
-  `blink_busy` + `blink_tmr` for this build.
+- `.tmp/embox` `conf/mods.conf` had a stale live `gpio_button` include
+  (breaks boot); it was trimmed to just `blink_busy` + `blink_tmr`.
 - Board rebooted cleanly after the tests; shell responsive.

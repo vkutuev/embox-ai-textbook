@@ -5,13 +5,14 @@ hardware timer interrupt.
 
 | Variant | Command | How the period is made |
 | ------- | ------- | ---------------------- |
-| Busy-wait | `blink_busy` | CPU spins in a calibrated delay loop |
+| Busy-wait | `blink_busy` | CPU spins in a delay loop, self-calibrated via `usleep()` + TMR1 counter |
 | Timer | `blink_tmr` | TMR1 period interrupt at 2 Hz toggles LED1 |
 
 ## Hardware
 
 - **TMR1** at `0x51009000` (TMR0 is Embox's clock-tick source — do not
-  touch it). Timer clock = 60 MHz system clock.
+  touch it). Timer clock ≈ 189 MHz (measured; the RCU driver's PLL
+  config is intended for 60 MHz — see the board guide).
 - Enable the timer: `RCU.CGCFGAPB1.TMR1EN` and `RCU.RSTDISAPB1.TMR1EN`
   (bit 17), then `SIU.TMREN.TMR1EN` (bit 1).
 - Registers: `CTRL` (+0x00, `MODE` bits 4–5), `PERIOD` (+0x0C), `IM`
@@ -35,9 +36,10 @@ hardware timer interrupt.
 
 - `blink_tmr`: LED1 blinks at exactly 1 Hz (one on/off cycle per
   second); the CPU stays idle between interrupts.
-- `blink_busy`: LED1 blinks at approximately the same rate; the CPU is
-  busy the whole time, and the rate drifts with the clock and compiler
-  optimizations (`DELAY_ITERATIONS` is a starting guess).
+- `blink_busy`: LED1 blinks at ~1 Hz too, but the CPU is busy the whole
+  time. It calibrates its own loop at startup (measures the loop cost
+  against `usleep()` and TMR1's free-running counter), so it does not
+  rely on a hard-coded clock.
 
 ## Notes
 

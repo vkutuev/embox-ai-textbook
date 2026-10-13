@@ -14,7 +14,7 @@ of counting CPU cycles.
 | ---- | ----- |
 | LED1 | GPIOC pin 12, active-high |
 | Timer | TMR1 at `5100_9000h` (TMR0 is Embox's clock tick) |
-| Timer clock | SYSCLK = 60 MHz (actual) |
+| Timer clock | SYSCLK ≈ 189 MHz (measured, 27 MHz × 7) |
 | Period IRQ | PLIC source 17 (TMR0–TMR15 = sources 16–31) |
 
 The timer must be enabled before counting:
@@ -33,18 +33,20 @@ Both are in
 
 | Variant | Command | Period source | CPU cost |
 | ------- | ------- | ------------- | -------- |
-| Busy-wait | `blink_busy` | calibrated delay loop | 100% while waiting |
+| Busy-wait | `blink_busy` | delay loop, self-calibrated via `usleep()` + TMR1 counter | 100% while waiting |
 | Timer | `blink_tmr` | TMR1 period interrupt at 2 Hz | idle between interrupts |
 
-- **Busy-wait** is simple but burns the CPU and is only as accurate as
-  the loop's calibration (and it drifts with the compiler/clock).
+- **Busy-wait** is simple but burns the CPU. It calibrates itself at
+  startup (measures the loop cost against `usleep()`), so its period is
+  accurate, but it still spins the CPU for the whole delay — the exact
+  thing the timer variant avoids.
 - **Timer** gives an exact, hardware-driven period and leaves the CPU
   free. It uses the same interrupt path as Embox's own clock tick, so
   it is safe on this board (unlike the GPIO interrupt path, which
   needed the mask-and-re-arm discipline in the LED/button example's
   [experiment journal](experiment-led-button-counter.md)).
 
-For `blink_tmr`, `PERIOD = 60 MHz / 2 − 1 = 29999999`: the interrupt
+For `blink_tmr`, `PERIOD = 189 MHz / 2 − 1 = 94499999`: the interrupt
 fires at 2 Hz, and each interrupt toggles LED1, giving one full on/off
 cycle per second (1 Hz).
 
@@ -71,8 +73,8 @@ cycle per second (1 Hz).
 
 1. `blink_tmr`: LED1 blinks steadily; time 20 blinks with a stopwatch —
    expect ~20 s (1 Hz).
-2. `blink_busy`: LED1 blinks at roughly the same rate; note the drift
-   and adjust `DELAY_ITERATIONS` if far off.
+2. `blink_busy`: LED1 blinks at ~1 Hz (it self-calibrates; the console
+   prints the computed iteration count at startup).
 3. Confirm the system stays responsive during `blink_tmr` (the shell is
    not blocked; the timer interrupt is shared with jiffies, which still
    ticks).

@@ -4,9 +4,10 @@
  *        TMR1 hardware timer and its interrupt.
  *
  * TMR1 (0x51009000) is used because TMR0 is the Embox jiffies clock
- * source. The timer runs at the 60 MHz system clock; PERIOD is set so
- * the period interrupt fires at 2 Hz, and the handler toggles LED1
- * (one full on/off cycle per second).
+ * source. The timer runs at the 189 MHz clock (27 MHz HSE x 7,
+ * measured on hardware); PERIOD is set so the period interrupt fires
+ * at 2 Hz, and the handler toggles LED1 (one full on/off cycle per
+ * second).
  *
  * The timer interrupt path (PLIC source 17) is safe: it is the same
  * mechanism Embox uses for its own clock tick (TMR0, source 16), so
@@ -40,10 +41,10 @@
 #define TMR_CTRL_MODE_1 (1U << 4)       /* count 0..PERIOD, IRQ at period */
 #define TMR_IM_TMR      (1U << 0)       /* period interrupt mask */
 
-#define SYSCLK_HZ       60000000UL
+#define TMR_CLK_HZ      189000000UL   /* measured: 27 MHz HSE x 7 (~189 MHz) */
 #define BLINK_HZ        1UL
 #define TOGGLE_HZ       (2UL * BLINK_HZ)
-#define TMR_PERIOD_VAL  (SYSCLK_HZ / TOGGLE_HZ - 1UL)
+#define TMR_PERIOD_VAL  (TMR_CLK_HZ / TOGGLE_HZ - 1UL)
 
 #define TMR1_IRQ        17
 
@@ -66,6 +67,9 @@ int main(int argc, char **argv) {
 	*(volatile unsigned int *)TMR_CTRL   = 0;
 	*(volatile unsigned int *)TMR_PERIOD = TMR_PERIOD_VAL;
 	*(volatile unsigned int *)TMR_IM     = TMR_IM_TMR;
+
+	/* Drop a stale registration from a previous run of this command. */
+	irq_detach(TMR1_IRQ, NULL);
 
 	if (0 > irq_attach(TMR1_IRQ, tmr1_irq_hnd, 0, NULL, "TMR1")) {
 		fprintf(stderr, "blink_tmr: cannot attach TMR1 IRQ\n");
