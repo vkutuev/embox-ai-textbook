@@ -13,4 +13,6 @@
 include embox.cmd.example.timer_blink.blink_busy
 
 # Variant 2: TMR1 hardware timer interrupt (exact 1 Hz)
+# (needs the POSIX signal module for the Ctrl+C cleanup)
+include embox.compat.posix.signal
 include embox.cmd.example.timer_blink.blink_tmr

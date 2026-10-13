@@ -16,6 +16,7 @@
 
 #include <stdio.h>
 #include <unistd.h>
+#include <signal.h>
 
 #include <drivers/gpio.h>
 #include <kernel/irq.h>
@@ -49,6 +50,7 @@
 #define TMR1_IRQ        17
 
 static volatile unsigned int ticks;
+static volatile int running = 1;
 
 static irq_return_t tmr1_irq_hnd(unsigned int irq_nr, void *data) {
 	*(volatile unsigned int *)TMR_IC = TMR_IM_TMR;
@@ -56,6 +58,10 @@ static irq_return_t tmr1_irq_hnd(unsigned int irq_nr, void *data) {
 	led1_toggle();
 
 	return IRQ_HANDLED;
+}
+
+static void sigint_handler(int sig) {
+	running = 0;
 }
 
 int main(int argc, char **argv) {
@@ -79,12 +85,21 @@ int main(int argc, char **argv) {
 	*(volatile unsigned int *)TMR_CTRL |= TMR_CTRL_MODE_1;
 	*(volatile unsigned int *)SIU_TMREN |= TMR1_EN_BIT;
 
+	signal(SIGINT, sigint_handler);
+
 	printf("blink_tmr: LED1 blinking at %lu Hz (Ctrl+C to stop)\n",
 			(unsigned long)BLINK_HZ);
 
-	while (1) {
-		usleep(1000 * 1000);
+	while (running) {
+		usleep(100 * 1000);
 	}
+
+	irq_detach(TMR1_IRQ, NULL);
+	*(volatile unsigned int *)TMR_IM = 0;
+	*(volatile unsigned int *)TMR_CTRL = 0;
+	*(volatile unsigned int *)SIU_TMREN &= ~TMR1_EN_BIT;
+
+	printf("blink_tmr: stopped\n");
 
 	return 0;
 }

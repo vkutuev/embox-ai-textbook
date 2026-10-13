@@ -42,4 +42,5 @@ module blink_tmr {
 
 	depends embox.driver.gpio.core
 	depends embox.kernel.irq
+	depends embox.compat.posix.signal
 }
