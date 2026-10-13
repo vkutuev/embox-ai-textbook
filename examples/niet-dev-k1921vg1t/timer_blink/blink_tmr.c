@@ -50,7 +50,7 @@
 #define TMR1_IRQ        17
 
 static volatile unsigned int ticks;
-static volatile int running = 1;
+static volatile int running;
 
 static irq_return_t tmr1_irq_hnd(unsigned int irq_nr, void *data) {
 	*(volatile unsigned int *)TMR_IC = TMR_IM_TMR;
@@ -65,6 +65,9 @@ static void sigint_handler(int sig) {
 }
 
 int main(int argc, char **argv) {
+	ticks = 0;
+	running = 1;
+
 	led1_init();
 
 	*(volatile unsigned int *)RCU_CGCFGAPB1  |= TMR1_CLK_BIT;
