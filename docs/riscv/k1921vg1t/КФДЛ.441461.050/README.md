@@ -154,6 +154,10 @@ Diagnostic helpers:
 - [PCA9685 PWM driver](example-i2c-pca9685.md) — drive an NXP PCA9685
   16-channel PWM controller over I2C0 (XP1 pins 5/3), sources in
   [examples/niet-dev-k1921vg1t/pca9685/](../../../../examples/niet-dev-k1921vg1t/pca9685/).
+- [HC-SR04 ultrasonic](example-hcsr04.md) — distance via a TMR1-timed
+  echo pulse; requires 5 V + a 10 kΩ/20 kΩ divider (not verified on this
+  board without resistors), sources in
+  [examples/niet-dev-k1921vg1t/hcsr04/](../../../../examples/niet-dev-k1921vg1t/hcsr04/).
 
 ## Flashing in dualcore mode (SRV-ON jumper)
 
