@@ -1,5 +1,5 @@
 diff --git a/src/drivers/input/button/gpio_button/gpio_button.c b/src/drivers/input/button/gpio_button/gpio_button.c
-index 7aa6fad12a..8da9b1a19c 100644
+index 7aa6fad12a..303e2330ed 100644
 --- a/src/drivers/input/button/gpio_button/gpio_button.c
 +++ b/src/drivers/input/button/gpio_button/gpio_button.c
 @@ -54,7 +54,7 @@ static int gpio_bt_irq_hnd(unsigned int irq_nr, void *data) {
@@ -7,7 +7,7 @@ index 7aa6fad12a..8da9b1a19c 100644
  	int res;
  	gpio_setup_mode(GPIO_BTN_PORT, GPIO_BTN_PIN_MASK,
 -			GPIO_MODE_INT_EN | GPIO_MODE_IN | GPIO_MODE_INT_SECTION | GPIO_MODE_INT_RISING_FALLING);
-+			GPIO_MODE_INT_EN | GPIO_MODE_IN | GPIO_MODE_INT_FALLING);
++			GPIO_MODE_INT_EN | GPIO_MODE_IN | GPIO_MODE_INT_RISING_FALLING);
  	res = gpio_irq_attach(GPIO_BTN_PORT, GPIO_BTN_PIN_MASK, gpio_bt_irq_hnd,
  			&gpio_bt_dev);
  	if (0 > res) {

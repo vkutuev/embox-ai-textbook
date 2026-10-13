@@ -62,7 +62,8 @@ The `gpio_button` boot storm has a separate, now-explained cause:
 edge flags, which overlaps every individual interrupt-mode bit, so
 `niiet_gpio` decoded a level trigger with rising polarity on the
 idle-high pin — asserting `INTSTATUS` permanently and storming the PLIC.
-Fixed by using a single `GPIO_MODE_INT_FALLING` edge (see the
+Fixed by dropping `GPIO_MODE_INT_SECTION` (keeping the both-edges
+`RISING_FALLING` mode) (see the
 [experiment journal](КФДЛ.441461.050/experiment-led-button-counter.md)).
 
 ## Sources

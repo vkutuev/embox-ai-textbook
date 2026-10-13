@@ -76,10 +76,14 @@ Observed at the hang (JTAG): `INTTYPESET=0`, `INTPOLSET=8`,
 `INTEDGESET=8`, `INTENSET=8`, `INTSTATUS=8`, PLIC pending = 9, `mepc` at
 the `INTENSET` write.
 
-**Fix**: drop `GPIO_MODE_INT_SECTION` and use a single falling edge
-(`GPIO_MODE_INT_EN | GPIO_MODE_IN | GPIO_MODE_INT_FALLING`). Verified:
-boot completes, shell starts, `gpio_button` initializes cleanly. Patch +
-PR description in `examples/.../led_button_counter/patches/` and
+**Fix**: drop `GPIO_MODE_INT_SECTION` and keep the both-edges
+`GPIO_MODE_INT_RISING_FALLING` mode
+(`GPIO_MODE_INT_EN | GPIO_MODE_IN | GPIO_MODE_INT_RISING_FALLING`), which
+now decodes to an **edge** trigger on both edges (the level-trigger
+misdecode was the `INT_SECTION` contamination, not the edge choice).
+Verified: boot completes, shell starts, `gpio_button` initializes
+cleanly, `INTEDGESET=8` / `INTSTATUS=0` at idle. Patch + PR description
+in `examples/.../led_button_counter/patches/` and
 `.tmp/PR-gpio-button-fix.md`.
 
 > The handler's event polarity (`USER_BUTTON_PRESSED` when the pin reads
@@ -101,7 +105,8 @@ PR description in `examples/.../led_button_counter/patches/` and
   `GPIO_MODE_INT_SECTION` (`0xff000000`) OR'd with the edge flags makes
   `niiet_gpio` decode a level trigger with rising polarity on the
   idle-high pin, so `INTSTATUS` stays asserted and the PLIC storms (see
-  above). Fixed by using a single `GPIO_MODE_INT_FALLING` edge.
+  above). Fixed by dropping `GPIO_MODE_INT_SECTION` (keeping the
+  both-edges `RISING_FALLING` mode).
 - The RISC-V trap handler nests interrupts during dispatch. With a
   re-asserting line (or a burst of bounce edges), this nests without
   bound and corrupts unrelated kernel state (the UART RX drain lthread).
