@@ -1,0 +1,45 @@
+package embox.cmd.example.timer_blink
+
+@AutoCmd
+@Cmd(name = "blink_busy",
+	help = "Blink LED1 with a busy-wait delay loop",
+	man = '''
+		NAME
+			blink_busy - NIIET-DEV-K1921VG1T LED blink, busy-wait variant
+		SYNOPSIS
+			blink_busy
+		DESCRIPTION
+			Toggles LED1 in an endless loop using a calibrated busy-wait
+			delay. CPU-bound and imprecise; contrast with blink_tmr.
+		AUTHORS
+			Embox AI textbook
+	''')
+module blink_busy {
+	source "board.h"
+	source "blink_busy.c"
+
+	depends embox.driver.gpio.core
+}
+
+@AutoCmd
+@Cmd(name = "blink_tmr",
+	help = "Blink LED1 at exactly 1 Hz with the TMR1 timer interrupt",
+	man = '''
+		NAME
+			blink_tmr - NIIET-DEV-K1921VG1T LED blink, timer variant
+		SYNOPSIS
+			blink_tmr
+		DESCRIPTION
+			Toggles LED1 at exactly 1 Hz using the TMR1 hardware timer
+			(0x51009000) and its PLIC interrupt (source 17). The CPU
+			stays idle between interrupts.
+		AUTHORS
+			Embox AI textbook
+	''')
+module blink_tmr {
+	source "board.h"
+	source "blink_tmr.c"
+
+	depends embox.driver.gpio.core
+	depends embox.kernel.irq
+}

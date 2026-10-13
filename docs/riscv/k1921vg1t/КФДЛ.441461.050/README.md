@@ -101,11 +101,14 @@ From the official board documentation (see Sources):
   freshly flashed image.
 - The `k1921vg1t` flash driver displays CFGWORD write protection as
   "enable", but register-based erase/write still works.
-- **Actual core frequency is 60 MHz, not 150 MHz.** The board config and
-  `core_freq=150000000` declare 150 MHz, but the RCU driver hardcodes the
-  27 MHz HSE branch (NDIV=100, RDIV=2, DIV1A=4, DIV1B=2 → 60 MHz); the
-  150 MHz PLL variant is commented out in the board config header. UART0
-  is clocked from HSE 27 MHz, so the console baud is unaffected.
+- **Measured core/timer frequency is ~189 MHz (27 MHz HSE × 7).** The
+  RCU driver's PLL configuration (NDIV=100, RDIV=2, DIV1A=4, DIV1B=2)
+  is *intended* for 60 MHz per its own comment, but the actual clock,
+  measured via the `mcycle` CSR and the TMR counter (and confirmed by a
+  timer blink rate), is ~189 MHz — a discrepancy to investigate. The
+  board config declares `core_freq=150000000`, which also does not
+  match. UART0 is clocked from HSE 27 MHz, so the console baud is
+  unaffected.
 
 ## Debug and flashing guide
 
@@ -142,6 +145,9 @@ Diagnostic helpers:
   Polling and IRQ variants are verified on hardware; the input variant
   hits a GPIO interrupt quirk — see the
   [experiment journal](experiment-led-button-counter.md).
+- [Timer blink](example-timer-blink.md) — LED1 blinking via a busy-wait
+  loop vs. the TMR1 hardware timer interrupt (exact 1 Hz), sources in
+  [examples/niet-dev-k1921vg1t/timer_blink/](../../../../examples/niet-dev-k1921vg1t/timer_blink/).
 
 ## Flashing in dualcore mode (SRV-ON jumper)
 

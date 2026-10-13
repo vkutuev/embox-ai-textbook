@@ -1,0 +1,16 @@
+# NIIET-DEV-K1921VG1T timer blink examples
+#
+# Install: copy this directory into an Embox checkout:
+#
+#     cp -r timer_blink/ <embox>/src/cmds/example/
+#
+# then add the line for ONE variant inside the conf block of
+# platform/niiet/templates/k1921vg1t_dev/mods.conf.
+#
+# Full instructions: docs/riscv/k1921vg1t/КФДЛ.441461.050/example-timer-blink.md
+
+# Variant 1: busy-wait delay loop
+include embox.cmd.example.timer_blink.blink_busy
+
+# Variant 2: TMR1 hardware timer interrupt (exact 1 Hz)
+include embox.cmd.example.timer_blink.blink_tmr
