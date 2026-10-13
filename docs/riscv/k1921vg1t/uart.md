@@ -52,6 +52,17 @@ FBRD = 5 (real baudrate 231911, error 0.656%). Maximum setting error is
 and no byte is being transmitted/received. New divider values take effect
 only after a subsequent write to `LCRH`.
 
+## Embox driver
+
+The Embox `k1921vg1t_dev` template uses the `pl011` driver. The board
+config (`platform/niiet/board_config/niiet_k1921vg1t_dev.conf.h`) already
+defines UART0 and UART1 (pins, IRQ, clock, baud); adding
+`embox.driver.serial.pl011_ttyS<N>` registers `/dev/ttyS<N>`, configures
+the pins (PB0/PB1 for UART0, PB4/PB5 for UART1, alt function 3), and
+enables the clock. The driver uses one shared `uartclk` option
+(27 MHz HSE on the dev board). Board usage:
+[UART1 echo example](КФДЛ.441461.050/example-uart1-echo.md).
+
 ## Sources
 
 - `doc/K1921VG1T/UM_K1921VG1T_10YA.pdf` in
