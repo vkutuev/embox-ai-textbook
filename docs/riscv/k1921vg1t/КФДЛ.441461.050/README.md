@@ -142,6 +142,9 @@ Diagnostic helpers:
   Polling and IRQ variants are verified on hardware; the input variant
   hits a GPIO interrupt quirk — see the
   [experiment journal](experiment-led-button-counter.md).
+- [Timer blink](example-timer-blink.md) — LED1 blinking via a busy-wait
+  loop vs. the TMR1 hardware timer interrupt (exact 1 Hz), sources in
+  [examples/niet-dev-k1921vg1t/timer_blink/](../../../../examples/niet-dev-k1921vg1t/timer_blink/).
 
 ## Flashing in dualcore mode (SRV-ON jumper)
 

@@ -10,6 +10,7 @@ the official user manual, errata, and quick-start guide.
 - [Core (SCR5)](core.md) — ISA, privilege modes, exceptions, MMU/MPU, caches,
   memory-mapped timer
 - [Clocks (RCU)](clocks.md) — clock sources, PLL configuration
+- [Timers (TMR)](timer.md) — timer register map, modes, interrupts
 - [Interrupts (PLIC)](interrupts.md) — interrupt vectors, register map,
   programming model
 - [Flash](flash.md) — FlashM/FlashD/OTP, config word, service erase
@@ -26,7 +27,9 @@ the official user manual, errata, and quick-start guide.
   [SDK OpenOCD configurations](КФДЛ.441461.050/experiment-sdk-openocd-configs.md),
   [GDB `load` flash](КФДЛ.441461.050/experiment-gdb-flash.md),
   [LED/button counter example](КФДЛ.441461.050/example-led-button-counter.md),
-  [LED/button counter experiment](КФДЛ.441461.050/experiment-led-button-counter.md)
+  [LED/button counter experiment](КФДЛ.441461.050/experiment-led-button-counter.md),
+  [timer blink example](КФДЛ.441461.050/example-timer-blink.md),
+  [timer blink experiment](КФДЛ.441461.050/experiment-timer-blink.md)
 
 ## Embox relevance
 
