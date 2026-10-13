@@ -55,8 +55,15 @@ and **not reproduced**: individual writes to `INTTYPESET`/`INTEDGECLR`/
 for the storm is button bounce amplified by the RISC-V trap handler's
 nested dispatch (`ipl_enable()`). The workaround — mask the pin on the
 first edge (`INTENCLR`), then clear `INTSTATUS` and re-arm `INTENSET` —
-is verified to work. A both-edges configuration on an idle-high pin
-(the `gpio_button` boot storm) is a separate, still-unexplained case.
+is verified to work.
+
+The `gpio_button` boot storm has a separate, now-explained cause:
+`gpio_button` passed `GPIO_MODE_INT_SECTION` (`0xff000000`) OR'd with the
+edge flags, which overlaps every individual interrupt-mode bit, so
+`niiet_gpio` decoded a level trigger with rising polarity on the
+idle-high pin — asserting `INTSTATUS` permanently and storming the PLIC.
+Fixed by using a single `GPIO_MODE_INT_FALLING` edge (see the
+[experiment journal](КФДЛ.441461.050/experiment-led-button-counter.md)).
 
 ## Sources
 

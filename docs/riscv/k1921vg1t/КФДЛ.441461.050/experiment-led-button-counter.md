@@ -55,18 +55,36 @@ interrupted thread's stack. That is an Embox core issue, not a
 `niiet_gpio` config bug, and the mask-on-first-edge workaround sidesteps
 it.
 
-### Input subsystem (gpio_button) — breaks every boot
+### Input subsystem (gpio_button) — boot storm, root cause found (2026-10-13)
 
 With `embox.driver.input.button.gpio_button(pin_port=1, pin_num=3)`
-enabled, the boot hangs at `initializing embox.driver.input.button.gpio_button`
-(runlevel 0): the driver configures a both-edges
-(`RISING_FALLING`) interrupt on the idle-high button pin, `INTSTATUS`
-latches at enable, and the PLIC storms before the button handler is
-attached. The boot only continued after the pending interrupt was
-claimed externally (a GDB read of the PLIC claim register
-`0xFE200004` returned 9 and unblocked the boot). The same
-mask/enable-only discipline would apply, but `gpio_button` would need a
-driver change (re-arm on a timer) — not done yet.
+enabled, the boot hung at
+`initializing embox.driver.input.button.gpio_button` (runlevel 0). The
+root cause is a mode-decoding bug in how `gpio_button` calls
+`gpio_setup_mode()`:
+
+`gpio_button` passed `GPIO_MODE_INT_SECTION | GPIO_MODE_INT_RISING_FALLING`.
+`GPIO_MODE_INT_SECTION` is `0xff000000`, which overlaps **every**
+individual interrupt-mode bit (`INT_EN`, `INT_RISING`, `INT_FALLING`,
+`INT_LEVEL0/1`, bits 24–29). So `niiet_gpio_setup_irq()` decoded the mode
+as a **level** trigger (`INTTYPESET=0`) with **rising** polarity
+(`INTPOLSET=8`, `INTEDGESET=8`) on the idle-high pin. A level interrupt
+on the pin's idle state asserts `INTSTATUS` permanently; write-1-to-clear
+re-latches instantly, so the PLIC storms before the handler is attached.
+
+Observed at the hang (JTAG): `INTTYPESET=0`, `INTPOLSET=8`,
+`INTEDGESET=8`, `INTENSET=8`, `INTSTATUS=8`, PLIC pending = 9, `mepc` at
+the `INTENSET` write.
+
+**Fix**: drop `GPIO_MODE_INT_SECTION` and use a single falling edge
+(`GPIO_MODE_INT_EN | GPIO_MODE_IN | GPIO_MODE_INT_FALLING`). Verified:
+boot completes, shell starts, `gpio_button` initializes cleanly. Patch +
+PR description in `examples/.../led_button_counter/patches/` and
+`.tmp/PR-gpio-button-fix.md`.
+
+> The handler's event polarity (`USER_BUTTON_PRESSED` when the pin reads
+> high) is still inverted for this active-low button — a separate,
+> unfixed issue.
 
 ## Root cause notes
 
@@ -79,9 +97,11 @@ driver change (re-arm on a timer) — not done yet.
   "re-config latch" hypothesis was not confirmed. The storm on a pressed
   button is best explained by bounce + the trap handler's nested
   dispatch (see above).
-- The `gpio_button` boot storm is a separate, still-unexplained case: a
-  both-edges configuration on an idle-high pin latches `INTSTATUS` at
-  enable.
+- The `gpio_button` boot storm is a **mode-decoding bug**: passing
+  `GPIO_MODE_INT_SECTION` (`0xff000000`) OR'd with the edge flags makes
+  `niiet_gpio` decode a level trigger with rising polarity on the
+  idle-high pin, so `INTSTATUS` stays asserted and the PLIC storms (see
+  above). Fixed by using a single `GPIO_MODE_INT_FALLING` edge.
 - The RISC-V trap handler nests interrupts during dispatch. With a
   re-asserting line (or a burst of bounce edges), this nests without
   bound and corrupts unrelated kernel state (the UART RX drain lthread).

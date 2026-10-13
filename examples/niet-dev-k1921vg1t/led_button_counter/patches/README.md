@@ -38,6 +38,20 @@ This patch fixes that. It is not strictly required by the example above
 any code that configures the same GPIO port more than once (e.g. the
 `gpio_button` driver).
 
+## 0002 — gpio_button: single falling edge, not a level interrupt
+
+`gpio_button` passed `GPIO_MODE_INT_SECTION | GPIO_MODE_INT_RISING_FALLING`.
+`GPIO_MODE_INT_SECTION` is `0xff000000`, which overlaps every individual
+interrupt-mode bit, so `niiet_gpio_setup_irq()` decoded the mode as a
+**level** trigger with **rising** polarity on the idle-high pin. That
+asserts `INTSTATUS` permanently and storms the PLIC, hanging the boot at
+`initializing embox.driver.input.button.gpio_button`.
+
+The patch drops `GPIO_MODE_INT_SECTION` and uses a single
+`GPIO_MODE_INT_FALLING` edge (press = low), which fixes the boot. (The
+handler's `USER_BUTTON_PRESSED` polarity is still inverted for an
+active-low button — a separate, unfixed issue.)
+
 ## PLIC start/end handshake (debugging note)
 
 The claim register (`0xFE200004`) uses a start/end protocol: reading it
