@@ -17,10 +17,12 @@ register, interrupt control, and four capture/compare (CAPCOM) blocks.
 
 ## Clock and enable
 
-- Timer clock = the system clock (SYSCLK). On the dev board the measured
-  SYSCLK is ~189 MHz (27 MHz HSE × 7; see the
-  [board README](КФДЛ.441461.050/README.md) — the RCU driver's PLL
-  config is intended for 60 MHz, but the measured value is 189 MHz).
+- Timer clock = the system clock (SYSCLK) selected by `CLKSEL` (bit 8),
+  divided by `CLKDIV`. On the dev board the timer clock was measured as
+  ~189 MHz by the timer-blink example (27 MHz HSE × 7), but as 150 MHz by
+  the [PWM example](pwm.md) — an unresolved discrepancy; see the
+  [PWM experiment](КФДЛ.441461.050/experiment-pwm.md). The RCU driver's
+  PLL config is intended for 60 MHz.
 - Enable the timer clock: `RCU.CGCFGAPB1.TMRnEN` and release the reset:
   `RCU.RSTDISAPB1.TMRnEN` (bit 16 + n).
 - Start counting: `SIU.TMREN.TMRnEN` (bit n).

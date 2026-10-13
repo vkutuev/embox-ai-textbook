@@ -11,6 +11,7 @@ the official user manual, errata, and quick-start guide.
   memory-mapped timer
 - [Clocks (RCU)](clocks.md) — clock sources, PLL configuration
 - [Timers (TMR)](timer.md) — timer register map, modes, interrupts
+- [PWM](pwm.md) — PWM via the TMR units, CAPCOM compare, Embox driver
 - [Interrupts (PLIC)](interrupts.md) — interrupt vectors, register map,
   programming model
 - [Flash](flash.md) — FlashM/FlashD/OTP, config word, service erase
@@ -36,7 +37,9 @@ the official user manual, errata, and quick-start guide.
   [PCA9685 I2C example](КФДЛ.441461.050/example-i2c-pca9685.md),
   [PCA9685 I2C experiment](КФДЛ.441461.050/experiment-i2c-pca9685.md),
   [HC-SR04 example](КФДЛ.441461.050/example-hcsr04.md),
-  [HC-SR04 experiment](КФДЛ.441461.050/experiment-hcsr04.md)
+  [HC-SR04 experiment](КФДЛ.441461.050/experiment-hcsr04.md),
+  [PWM example](КФДЛ.441461.050/example-pwm.md),
+  [PWM experiment](КФДЛ.441461.050/experiment-pwm.md)
 
 ## Embox relevance
 

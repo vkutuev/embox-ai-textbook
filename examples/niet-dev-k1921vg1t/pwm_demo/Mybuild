@@ -1,0 +1,23 @@
+package embox.cmd.example.pwm_demo
+
+@AutoCmd
+@Cmd(name = "pwm_demo",
+	help = "PWM output on PWM1 (TMR1), channel 0 = PA4",
+	man = '''
+		NAME
+			pwm_demo - NIIET-DEV-K1921VG1T PWM output
+		SYNOPSIS
+			pwm_demo <freq_hz> <duty_pct>
+			pwm_demo sweep <freq_hz>
+		DESCRIPTION
+			Generates a PWM waveform on PWM1 (TMR1) channel 0 (PA4,
+			XP1 pin 19) using the niiet PWM driver. Observe the output
+			on a logic analyzer.
+		AUTHORS
+			Embox AI textbook
+	''')
+module pwm_demo {
+	source "pwm_demo.c"
+
+	depends embox.driver.pwm.pwm_dev
+}

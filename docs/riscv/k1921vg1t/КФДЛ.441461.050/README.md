@@ -158,6 +158,9 @@ Diagnostic helpers:
   echo pulse; requires 5 V + a 10 kΩ/20 kΩ divider (not verified on this
   board without resistors), sources in
   [examples/niet-dev-k1921vg1t/hcsr04/](../../../../examples/niet-dev-k1921vg1t/hcsr04/).
+- [PWM output](example-pwm.md) — PWM on PWM1 (TMR1) via the niiet PWM
+  driver (XP1 pin 19), sources in
+  [examples/niet-dev-k1921vg1t/pwm_demo/](../../../../examples/niet-dev-k1921vg1t/pwm_demo/).
 
 ## Flashing in dualcore mode (SRV-ON jumper)
 
