@@ -148,6 +148,9 @@ Diagnostic helpers:
 - [Timer blink](example-timer-blink.md) — LED1 blinking via a busy-wait
   loop vs. the TMR1 hardware timer interrupt (exact 1 Hz), sources in
   [examples/niet-dev-k1921vg1t/timer_blink/](../../../../examples/niet-dev-k1921vg1t/timer_blink/).
+- [UART1 echo](example-uart1-echo.md) — echo bytes on UART1 via an
+  external USB-UART dongle (XP2 pins 1/3), sources in
+  [examples/niet-dev-k1921vg1t/uart1_echo/](../../../../examples/niet-dev-k1921vg1t/uart1_echo/).
 
 ## Flashing in dualcore mode (SRV-ON jumper)
 
