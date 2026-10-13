@@ -12,6 +12,7 @@ the official user manual, errata, and quick-start guide.
 - [Clocks (RCU)](clocks.md) — clock sources, PLL configuration
 - [Timers (TMR)](timer.md) — timer register map, modes, interrupts
 - [PWM](pwm.md) — PWM via the TMR units, CAPCOM compare, Embox driver
+- [DMA](dma.md) — DMA controller, channel registers, memory-to-memory
 - [Interrupts (PLIC)](interrupts.md) — interrupt vectors, register map,
   programming model
 - [Flash](flash.md) — FlashM/FlashD/OTP, config word, service erase
@@ -39,7 +40,9 @@ the official user manual, errata, and quick-start guide.
   [HC-SR04 example](КФДЛ.441461.050/example-hcsr04.md),
   [HC-SR04 experiment](КФДЛ.441461.050/experiment-hcsr04.md),
   [PWM example](КФДЛ.441461.050/example-pwm.md),
-  [PWM experiment](КФДЛ.441461.050/experiment-pwm.md)
+  [PWM experiment](КФДЛ.441461.050/experiment-pwm.md),
+  [DMA example](КФДЛ.441461.050/example-dma.md),
+  [DMA experiment](КФДЛ.441461.050/experiment-dma.md)
 
 ## Embox relevance
 

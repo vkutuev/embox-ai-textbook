@@ -1,0 +1,15 @@
+# NIIET-DEV-K1921VG1T DMA example
+#
+# Install: copy this directory into an Embox checkout:
+#
+#     cp -r dma_copy/ <embox>/src/cmds/example/
+#
+# then add the lines below inside the conf block of
+# platform/niiet/templates/k1921vg1t_dev/mods.conf.
+#
+# The DMA driver is NOT enabled by the stock template; add it (its base
+# address and channel IRQs come from the board config dmas[] entry):
+include embox.driver.dma.niiet_dma_drv
+
+# The example command
+include embox.cmd.example.dma_copy.dma_copy
