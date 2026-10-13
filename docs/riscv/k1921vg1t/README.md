@@ -30,7 +30,8 @@ the official user manual, errata, and quick-start guide.
   [LED/button counter experiment](КФДЛ.441461.050/experiment-led-button-counter.md),
   [timer blink example](КФДЛ.441461.050/example-timer-blink.md),
   [timer blink experiment](КФДЛ.441461.050/experiment-timer-blink.md),
-  [UART1 echo example](КФДЛ.441461.050/example-uart1-echo.md)
+  [UART1 echo example](КФДЛ.441461.050/example-uart1-echo.md),
+  [UART1 echo experiment](КФДЛ.441461.050/experiment-uart1-echo.md)
 
 ## Embox relevance
 

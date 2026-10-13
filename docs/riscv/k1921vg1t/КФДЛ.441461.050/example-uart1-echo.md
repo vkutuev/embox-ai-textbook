@@ -4,6 +4,10 @@ Echo bytes on **UART1** using an external USB-UART dongle, while the
 console keeps working on **UART0**. The point is to use a second UART
 beyond the console, with its own device node (`/dev/ttyS1`).
 
+> **Status: verified on hardware (2026-10-13)** — `hello` typed on the
+> dongle echoes back; the console stays independent. See the
+> [experiment journal](experiment-uart1-echo.md).
+
 ## Hardware
 
 | Board (XP2) | MCU pin | Alt fn | Dongle pin |
@@ -59,8 +63,9 @@ include embox.cmd.example.uart1_echo.uart1_echo
 
 ## Verification checklist (on hardware)
 
-1. Type in the dongle terminal → each character/line echoes back.
-2. The console (`ttyS0`) still runs `version`, etc., unaffected.
+1. Type in the dongle terminal → each character/line echoes back. ✔
+   (2026-10-13)
+2. The console (`ttyS0`) still runs `version`, etc., unaffected. ✔
 3. (Optional) Capture TX/RX with the logic analyzer and confirm the
    115200 framing and the echo turnaround.
 4. If output is garbled, check UART1's clock source (RCU `UARTCLKCFG1`,
