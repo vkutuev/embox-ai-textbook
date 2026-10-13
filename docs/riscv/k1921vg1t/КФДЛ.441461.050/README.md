@@ -151,6 +151,9 @@ Diagnostic helpers:
 - [UART1 echo](example-uart1-echo.md) — echo bytes on UART1 via an
   external USB-UART dongle (XP2 pins 1/3), sources in
   [examples/niet-dev-k1921vg1t/uart1_echo/](../../../../examples/niet-dev-k1921vg1t/uart1_echo/).
+- [PCA9685 PWM driver](example-i2c-pca9685.md) — drive an NXP PCA9685
+  16-channel PWM controller over I2C0 (XP1 pins 5/3), sources in
+  [examples/niet-dev-k1921vg1t/pca9685/](../../../../examples/niet-dev-k1921vg1t/pca9685/).
 
 ## Flashing in dualcore mode (SRV-ON jumper)
 
