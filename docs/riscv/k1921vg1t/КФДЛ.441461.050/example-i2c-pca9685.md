@@ -6,6 +6,10 @@ peripheral on the I2C bus and write a small register-level device driver.
 The generated PWM is observed with a logic analyzer (no LEDs or servos
 needed).
 
+> **Status: verified on hardware (2026-10-13)** — the device responds on
+> I2C0 at `0x40` and the PWM was observed in PulseView at 1.1 kHz. See the
+> [experiment journal](experiment-i2c-pca9685.md).
+
 ## Hardware
 
 | Board | Signal | PCA9685 module |
@@ -80,15 +84,15 @@ frequency via the PRE_SCALE divider), `set` (per-channel duty), `all`
 
 ## Verification checklist (on hardware)
 
-1. `i2cdetect -y 0` reports the device at `0x40`.
-2. `pca9685 info` reads back MODE1/MODE2/PRE_SCALE (device responds).
-3. Logic analyzer on PWM0 shows a square wave at the requested frequency
-   (e.g. ~1 kHz for `init 1000`).
-4. Changing `off` changes the duty cycle in the analyzer (e.g. 50% ->
-   25%).
-5. If SCL is off-frequency (e.g. ~54 kHz instead of 100 kHz), `CLK_I2C0`
-   is not 50 MHz as the driver assumes — note the actual SCL and adjust
-   the driver's `I2C_SYSTEM_FREQ` accordingly.
+1. `i2cdetect -y 0` reports the device at `0x40`. ✔ (2026-10-13)
+2. `pca9685 info` reads back MODE1/MODE2/PRE_SCALE (device responds). ✔
+3. Logic analyzer on PWM0 shows a square wave. ✔ — measured **1.1 kHz**
+   for `init 1000` (the PCA9685's internal oscillator runs ~27 MHz, not
+   the nominal 25 MHz; see the experiment journal).
+4. Changing `off` changes the duty cycle (verified by reading back the
+   LED0_OFF register: `0x0800` for 2048, `0x0400` for 1024). ✔
+5. SCL frequency not measured — the driver's `CLK_I2C0 = 50 MHz`
+   assumption is still unverified.
 
 ## Sources
 
