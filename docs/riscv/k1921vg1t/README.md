@@ -34,7 +34,9 @@ the official user manual, errata, and quick-start guide.
   [UART1 echo example](КФДЛ.441461.050/example-uart1-echo.md),
   [UART1 echo experiment](КФДЛ.441461.050/experiment-uart1-echo.md),
   [PCA9685 I2C example](КФДЛ.441461.050/example-i2c-pca9685.md),
-  [PCA9685 I2C experiment](КФДЛ.441461.050/experiment-i2c-pca9685.md)
+  [PCA9685 I2C experiment](КФДЛ.441461.050/experiment-i2c-pca9685.md),
+  [HC-SR04 example](КФДЛ.441461.050/example-hcsr04.md),
+  [HC-SR04 experiment](КФДЛ.441461.050/experiment-hcsr04.md)
 
 ## Embox relevance
 
