@@ -1,0 +1,25 @@
+package embox.cmd.example.pca9685
+
+@AutoCmd
+@Cmd(name = "pca9685",
+	help = "PCA9685 16-channel PWM driver (I2C0)",
+	man = '''
+		NAME
+			pca9685 - NIIET-DEV-K1921VG1T PCA9685 PWM driver
+		SYNOPSIS
+			pca9685 info
+			pca9685 init [freq_hz]
+			pca9685 set <channel> <off>
+			pca9685 all <off>
+		DESCRIPTION
+			Configures an NXP PCA9685 16-channel 12-bit PWM controller
+			on I2C0 (XP1 pin 5 = SDA, pin 3 = SCL). Use the logic
+			analyzer on a PWM output to observe the waveform.
+		AUTHORS
+			Embox AI textbook
+	''')
+module pca9685 {
+	source "pca9685.c"
+
+	depends embox.driver.i2c_core
+}

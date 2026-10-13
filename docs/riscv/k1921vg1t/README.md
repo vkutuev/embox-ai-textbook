@@ -15,6 +15,7 @@ the official user manual, errata, and quick-start guide.
   programming model
 - [Flash](flash.md) — FlashM/FlashD/OTP, config word, service erase
 - [UART](uart.md) — UART register map and baud-rate setup
+- [I2C](i2c.md) — I2C controller register map and Embox driver
 - [GPIO](gpio.md) — GPIO port registers
 - [Debugging](debugging.md) — JTAG, OpenOCD, toolchain, SDK
 - [Errata](errata.md) — known silicon issues and workarounds
@@ -31,7 +32,8 @@ the official user manual, errata, and quick-start guide.
   [timer blink example](КФДЛ.441461.050/example-timer-blink.md),
   [timer blink experiment](КФДЛ.441461.050/experiment-timer-blink.md),
   [UART1 echo example](КФДЛ.441461.050/example-uart1-echo.md),
-  [UART1 echo experiment](КФДЛ.441461.050/experiment-uart1-echo.md)
+  [UART1 echo experiment](КФДЛ.441461.050/experiment-uart1-echo.md),
+  [PCA9685 I2C example](КФДЛ.441461.050/example-i2c-pca9685.md)
 
 ## Embox relevance
 
