@@ -43,6 +43,7 @@ hardware timer interrupt.
 
 - `blink_tmr` uses `irq_attach(17, ...)` — the same interrupt path as
   Embox's own clock tick, so it is safe on this board (unlike the GPIO
-  interrupt, which has a latch quirk; see the LED/button example).
+  interrupt path, which needs a mask-and-re-arm discipline; see the
+  LED/button example).
 - The timer's `CTRL.MODE=1` counts 0..`PERIOD` and raises the period
   interrupt at the wrap.

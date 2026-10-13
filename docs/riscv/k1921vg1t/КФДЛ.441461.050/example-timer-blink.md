@@ -40,8 +40,9 @@ Both are in
   the loop's calibration (and it drifts with the compiler/clock).
 - **Timer** gives an exact, hardware-driven period and leaves the CPU
   free. It uses the same interrupt path as Embox's own clock tick, so
-  it is safe on this board (unlike GPIO interrupts — see the LED/button
-  example's experiment journal).
+  it is safe on this board (unlike the GPIO interrupt path, which
+  needed the mask-and-re-arm discipline in the LED/button example's
+  [experiment journal](experiment-led-button-counter.md)).
 
 For `blink_tmr`, `PERIOD = 60 MHz / 2 − 1 = 29999999`: the interrupt
 fires at 2 Hz, and each interrupt toggles LED1, giving one full on/off
