@@ -161,6 +161,9 @@ Diagnostic helpers:
 - [PWM output](example-pwm.md) — PWM on PWM1 (TMR1) via the niiet PWM
   driver (XP1 pin 19), sources in
   [examples/niet-dev-k1921vg1t/pwm_demo/](../../../../examples/niet-dev-k1921vg1t/pwm_demo/).
+- [DMA copy](example-dma.md) — memory-to-memory DMA copy via DMA0 (no
+  wiring), sources in
+  [examples/niet-dev-k1921vg1t/dma_copy/](../../../../examples/niet-dev-k1921vg1t/dma_copy/).
 
 ## Flashing in dualcore mode (SRV-ON jumper)
 
