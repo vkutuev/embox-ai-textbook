@@ -1,0 +1,20 @@
+package embox.cmd.example.sharp_2y0a21
+
+@AutoCmd
+@Cmd(name = "sharp",
+	help = "Read a Sharp GP2Y0A21 IR distance sensor (ADC ch8)",
+	man = '''
+		NAME
+			sharp - NIIET-DEV-K1921VG1T Sharp GP2Y0A21 distance sensor
+		SYNOPSIS
+			sharp [samples]
+		DESCRIPTION
+			Reads a Sharp GP2Y0A21YK0F on PA8 (ADC channel 8) and prints
+			the raw value, voltage, and distance in cm. Sensor powered
+			from 5 V; keep objects 10-80 cm away.
+		AUTHORS
+			Embox AI textbook
+	''')
+module sharp {
+	source "sharp.c"
+}

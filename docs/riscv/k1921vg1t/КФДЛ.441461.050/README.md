@@ -167,6 +167,9 @@ Diagnostic helpers:
 - [ADC temperature sensor](example-adc-tsensor.md) — read the internal
   temperature sensor via the ADC (channel 63, no wiring), sources in
   [examples/niet-dev-k1921vg1t/adc_tsensor/](../../../../examples/niet-dev-k1921vg1t/adc_tsensor/).
+- [Sharp distance sensor](example-sharp-2y0a21.md) — Sharp GP2Y0A21 IR
+  distance on ADC channel 8 (PA8, XP1 pin 27), sources in
+  [examples/niet-dev-k1921vg1t/sharp_2y0a21/](../../../../examples/niet-dev-k1921vg1t/sharp_2y0a21/).
 
 ## Flashing in dualcore mode (SRV-ON jumper)
 

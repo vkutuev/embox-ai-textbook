@@ -1,0 +1,12 @@
+# NIIET-DEV-K1921VG1T Sharp GP2Y0A21 example
+#
+# Install: copy this directory into an Embox checkout:
+#
+#     cp -r sharp_2y0a21/ <embox>/src/cmds/example/
+#
+# then add the line below inside the conf block of
+# platform/niiet/templates/k1921vg1t_dev/mods.conf.
+#
+# No driver modules are needed: Embox has no ADC driver, so the command
+# programs the ADC registers directly (RCU ADCCFG, ACTL[0], sequencer 0).
+include embox.cmd.example.sharp_2y0a21.sharp

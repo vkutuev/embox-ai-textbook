@@ -45,7 +45,9 @@ the official user manual, errata, and quick-start guide.
   [DMA example](КФДЛ.441461.050/example-dma.md),
   [DMA experiment](КФДЛ.441461.050/experiment-dma.md),
   [ADC temperature-sensor example](КФДЛ.441461.050/example-adc-tsensor.md),
-  [ADC temperature-sensor experiment](КФДЛ.441461.050/experiment-adc-tsensor.md)
+  [ADC temperature-sensor experiment](КФДЛ.441461.050/experiment-adc-tsensor.md),
+  [Sharp distance-sensor example](КФДЛ.441461.050/example-sharp-2y0a21.md),
+  [Sharp distance-sensor experiment](КФДЛ.441461.050/experiment-sharp-2y0a21.md)
 
 ## Embox relevance
 
