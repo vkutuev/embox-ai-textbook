@@ -1,0 +1,13 @@
+# NIIET-DEV-K1921VG1T internal temperature sensor example
+#
+# Install: copy this directory into an Embox checkout:
+#
+#     cp -r adc_tsensor/ <embox>/src/cmds/example/
+#
+# then add the line below inside the conf block of
+# platform/niiet/templates/k1921vg1t_dev/mods.conf.
+#
+# No driver modules are needed: Embox has no ADC driver, so the command
+# programs the ADC registers (RCU ADCCFG, ACTL[3], sequencer 0, SIU
+# TSENSCTRL) directly.
+include embox.cmd.example.adc_tsensor.tsensor

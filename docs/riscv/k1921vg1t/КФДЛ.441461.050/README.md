@@ -164,6 +164,9 @@ Diagnostic helpers:
 - [DMA copy](example-dma.md) — memory-to-memory DMA copy via DMA0 (no
   wiring), sources in
   [examples/niet-dev-k1921vg1t/dma_copy/](../../../../examples/niet-dev-k1921vg1t/dma_copy/).
+- [ADC temperature sensor](example-adc-tsensor.md) — read the internal
+  temperature sensor via the ADC (channel 63, no wiring), sources in
+  [examples/niet-dev-k1921vg1t/adc_tsensor/](../../../../examples/niet-dev-k1921vg1t/adc_tsensor/).
 
 ## Flashing in dualcore mode (SRV-ON jumper)
 

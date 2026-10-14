@@ -13,6 +13,7 @@ the official user manual, errata, and quick-start guide.
 - [Timers (TMR)](timer.md) — timer register map, modes, interrupts
 - [PWM](pwm.md) — PWM via the TMR units, CAPCOM compare, Embox driver
 - [DMA](dma.md) — DMA controller, channel registers, memory-to-memory
+- [ADC](adc.md) — ADC blocks, sequencers, internal temperature sensor
 - [Interrupts (PLIC)](interrupts.md) — interrupt vectors, register map,
   programming model
 - [Flash](flash.md) — FlashM/FlashD/OTP, config word, service erase
@@ -42,7 +43,9 @@ the official user manual, errata, and quick-start guide.
   [PWM example](КФДЛ.441461.050/example-pwm.md),
   [PWM experiment](КФДЛ.441461.050/experiment-pwm.md),
   [DMA example](КФДЛ.441461.050/example-dma.md),
-  [DMA experiment](КФДЛ.441461.050/experiment-dma.md)
+  [DMA experiment](КФДЛ.441461.050/experiment-dma.md),
+  [ADC temperature-sensor example](КФДЛ.441461.050/example-adc-tsensor.md),
+  [ADC temperature-sensor experiment](КФДЛ.441461.050/experiment-adc-tsensor.md)
 
 ## Embox relevance
 
