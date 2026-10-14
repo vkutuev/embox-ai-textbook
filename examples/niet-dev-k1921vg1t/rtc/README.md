@@ -5,9 +5,11 @@ the CR1220 battery) and use it through Embox's RTC subsystem.
 
 ## Hardware
 
-- Insert a **CR1220** cell into the board's battery holder (or supply
-  `V_BAT` on XP3 pin 37). This keeps the RTC running when the board's
-  main power is off. No other wiring — the crystal is on the board.
+- Insert a **CR1220** cell into the board's battery holder (X6) **and
+  install a jumper on the "BAT ON" connector (XP6)**. The jumper connects
+  the onboard cell to the MCU's `VBAT`; without it, `VBAT` routes to
+  `V_BAT` on XP3 pin 37 (external battery input), so the onboard cell
+  does nothing. No other wiring — the crystal is on the board.
 
 ## Install into Embox
 

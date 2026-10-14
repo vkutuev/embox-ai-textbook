@@ -101,6 +101,11 @@ From the official board documentation (see Sources):
   freshly flashed image.
 - The `k1921vg1t` flash driver displays CFGWORD write protection as
   "enable", but register-based erase/write still works.
+- **RTC battery needs the XP6 jumper.** The CR1220 in the holder (X6) only
+  backs up the RTC's `VBAT` if a jumper is installed on **XP6 ("BAT ON")**.
+  Without it, `VBAT` is routed to `V_BAT` on XP3 pin 37 (external battery
+  input). XP6 also lets you measure `VBAT` current (remove the jumper and
+  insert an ammeter).
 - **Measured core/timer frequency is ~189 MHz (27 MHz HSE × 7).** The
   RCU driver's PLL configuration (NDIV=100, RDIV=2, DIV1A=4, DIV1B=2)
   is *intended* for 60 MHz per its own comment, but the actual clock,
