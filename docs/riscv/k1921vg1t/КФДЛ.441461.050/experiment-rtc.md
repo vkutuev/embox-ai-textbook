@@ -22,11 +22,15 @@ across a reset.
 - The driver switches to the 32.768 kHz crystal (`CONTROL.DRC`) once
   `STATUS.OSCOK` reports it.
 
-## Not yet verified
+## Battery persistence
 
-- **Battery persistence**: removing the 12 V power (so the RTC runs from
-  the CR1220) was not tested here — that is the user's power-cycle step.
-  The reset persistence (3.3 V rail) is confirmed.
+- **Verified**: with the CR1220 in the holder and a jumper on **XP6
+  ("BAT ON")**, removing the 12 V power for ~10 s and re-applying kept
+  the time running.
+- **XP6 jumper**: without it, the MCU's `VBAT` pin is routed to `V_BAT`
+  on XP3 pin 37 (external battery input), so the onboard cell does not
+  back up the RTC. XP6 also lets you measure `VBAT` current (remove the
+  jumper, insert an ammeter).
 
 ## Environment notes
 

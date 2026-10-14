@@ -4,13 +4,15 @@ Bring up the VG1T RTC and use it through Embox's RTC subsystem and the
 stock `rtc` command. The CR1220 battery keeps the time across power-off.
 
 > **Status: verified on hardware (2026-10-14)** — `rtc -s` sets the time,
-> `rtc` reads it back, and it persists across a reset. See the
-> [experiment journal](experiment-rtc.md).
+> `rtc` reads it back, it persists across a reset, and it keeps time on
+> the battery. See the [experiment journal](experiment-rtc.md).
 
 ## Hardware
 
-Insert a **CR1220** cell into the board's battery holder (or supply
-`V_BAT` on XP3 pin 37). No other wiring.
+Insert a **CR1220** cell into the board's battery holder (X6) **and
+install a jumper on the "BAT ON" connector (XP6)**. Without the jumper,
+the MCU's `VBAT` pin routes to `V_BAT` on XP3 pin 37 (external battery
+input), so the onboard cell does nothing.
 
 ## Build and run
 
@@ -34,7 +36,7 @@ Insert a **CR1220** cell into the board's battery holder (or supply
 1. `rtc -s` sets the time and `rtc` reads it back. ✔ (2026-10-14)
 2. The time persists across a reset. ✔
 3. (Battery) Remove the 12 V power for a few seconds, re-apply, and
-   confirm `rtc` still shows the running time.
+   confirm `rtc` still shows the running time. ✔
 
 ## How it works
 
