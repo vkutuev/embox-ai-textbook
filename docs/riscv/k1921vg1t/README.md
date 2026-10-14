@@ -18,6 +18,7 @@ the official user manual, errata, and quick-start guide.
 - [Interrupts (PLIC)](interrupts.md) — interrupt vectors, register map,
   programming model
 - [Flash](flash.md) — FlashM/FlashD/OTP, config word, service erase
+- [RTC](rtc.md) — real-time clock, seconds counter, Embox driver
 - [UART](uart.md) — UART register map and baud-rate setup
 - [I2C](i2c.md) — I2C controller register map and Embox driver
 - [GPIO](gpio.md) — GPIO port registers
@@ -50,7 +51,9 @@ the official user manual, errata, and quick-start guide.
   [Sharp distance-sensor example](КФДЛ.441461.050/example-sharp-2y0a21.md),
   [Sharp distance-sensor experiment](КФДЛ.441461.050/experiment-sharp-2y0a21.md),
   [SDRAM example](КФДЛ.441461.050/example-sdram.md),
-  [SDRAM experiment](КФДЛ.441461.050/experiment-sdram.md)
+  [SDRAM experiment](КФДЛ.441461.050/experiment-sdram.md),
+  [RTC example](КФДЛ.441461.050/example-rtc.md),
+  [RTC experiment](КФДЛ.441461.050/experiment-rtc.md)
 
 ## Embox relevance
 
