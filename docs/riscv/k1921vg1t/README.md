@@ -7,6 +7,7 @@ the official user manual, errata, and quick-start guide.
 
 - [Overview](overview.md) — MCU features, family, packages
 - [Memory map](memory-map.md) — address space and peripheral register map
+- [SDRAM (EMC)](sdram.md) — external SDRAM controller and bring-up
 - [Core (SCR5)](core.md) — ISA, privilege modes, exceptions, MMU/MPU, caches,
   memory-mapped timer
 - [Clocks (RCU)](clocks.md) — clock sources, PLL configuration
@@ -47,7 +48,9 @@ the official user manual, errata, and quick-start guide.
   [ADC temperature-sensor example](КФДЛ.441461.050/example-adc-tsensor.md),
   [ADC temperature-sensor experiment](КФДЛ.441461.050/experiment-adc-tsensor.md),
   [Sharp distance-sensor example](КФДЛ.441461.050/example-sharp-2y0a21.md),
-  [Sharp distance-sensor experiment](КФДЛ.441461.050/experiment-sharp-2y0a21.md)
+  [Sharp distance-sensor experiment](КФДЛ.441461.050/experiment-sharp-2y0a21.md),
+  [SDRAM example](КФДЛ.441461.050/example-sdram.md),
+  [SDRAM experiment](КФДЛ.441461.050/experiment-sdram.md)
 
 ## Embox relevance
 

@@ -170,6 +170,9 @@ Diagnostic helpers:
 - [Sharp distance sensor](example-sharp-2y0a21.md) — Sharp GP2Y0A21 IR
   distance on ADC channel 8 (PA8, XP1 pin 27), sources in
   [examples/niet-dev-k1921vg1t/sharp_2y0a21/](../../../../examples/niet-dev-k1921vg1t/sharp_2y0a21/).
+- [SDRAM bring-up](example-sdram.md) — bring up the 32 MB external SDRAM
+  and verify it (no wiring), sources in
+  [examples/niet-dev-k1921vg1t/sdram/](../../../../examples/niet-dev-k1921vg1t/sdram/).
 
 ## Flashing in dualcore mode (SRV-ON jumper)
 
