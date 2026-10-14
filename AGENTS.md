@@ -77,3 +77,11 @@ converters):
   run). After new facts are established, revise the affected guide
   sections so stale claims do not remain.
 - Verify changes (spellcheck, consistent formatting) before asking the user to review.
+- Merge workflow (once the user approves): create a feature branch off
+  `main`, commit there, then merge into `main` with `git merge --no-ff`,
+  push, and delete the local feature branch. Do not commit directly on
+  `main`.
+- Cross-cutting patterns, recurring gotchas, and open questions are kept
+  in the board's `development-notes.md` (e.g.
+  `docs/riscv/k1921vg1t/КФДЛ.441461.050/development-notes.md`); update it
+  when a new one emerges.
