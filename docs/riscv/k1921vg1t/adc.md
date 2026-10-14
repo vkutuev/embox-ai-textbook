@@ -38,10 +38,14 @@ FIFO. The internal temperature sensor is wired to **channel 63 (block
 ## Embox note
 
 Embox has no ADC driver, so the [temperature-sensor example]
-(КФДЛ.441461.050/example-adc-tsensor.md) programs the registers directly
-(RCU, `ACTL[3]`, sequencer 0, SIU `TSENSCTRL`). A sequencer conversion is
-triggered by pulsing `GSYNC` while keeping `SYNC0` set (writing only
-`GSYNC` clears `SYNC0` and disables the trigger).
+(КФДЛ.441461.050/example-adc-tsensor.md) and the
+[Sharp distance-sensor example](КФДЛ.441461.050/example-sharp-2y0a21.md)
+program the registers directly (RCU, `ACTL[n]`, sequencer 0). External
+channels (0-15 on block 0, 16-31 on block 1, ...) are read the same way;
+the analog pin is made a hi-Z input (clear `OUTEN`/`ALTFUNC`) and sampled
+via the matching `ACTL[n]` block. A sequencer conversion is triggered by
+pulsing `GSYNC` while keeping `SYNC0` set (writing only `GSYNC` clears
+`SYNC0` and disables the trigger).
 
 ## Sources
 
