@@ -1,0 +1,13 @@
+# NIIET-DEV-K1921VG1T SDRAM example
+#
+# Install: copy this directory into an Embox checkout:
+#
+#     cp -r sdram/ <embox>/src/cmds/example/
+#
+# then add the line below inside the conf block of
+# platform/niiet/templates/k1921vg1t_dev/mods.conf.
+#
+# No driver modules are needed: the command programs the SDRAM pins,
+# clock (RCU SDRAMCFG), and controller directly (Embox has no SDRAM
+# driver).
+include embox.cmd.example.sdram.sdram
