@@ -70,7 +70,7 @@ From the official board documentation (see Sources):
   wired to the CH340B USB-UART (connector XS4) at 115200 baud.
 - **Crystals** — 27 MHz (BQ2, HSE), 25 MHz (BQ1, Ethernet), 32.768 kHz
   (BQ3, RTC).
-- **SDRAM** — two SDRAM chips, 16 MB total.
+- **SDRAM** — two SDRAM chips, 32 MB total.
 
 ## Board quirks discovered during bring-up
 
@@ -142,6 +142,9 @@ Diagnostic helpers:
   for state inspection
 
 ## Examples
+
+Cross-cutting patterns, gotchas, and open questions are consolidated in
+[Development notes](development-notes.md).
 
 - [LED/button counter](example-led-button-counter.md) — USER button
   increments a counter shown in binary on the four LEDs (board LED1–LED4);
