@@ -1,0 +1,15 @@
+# NIIET-DEV-K1921VG1T RTC example
+#
+# Install: copy the niiet RTC driver into an Embox checkout:
+#
+#     cp -r rtc/ <embox>/src/drivers/rtc/niiet/
+#
+# then add the lines below inside the conf block of
+# platform/niiet/templates/k1921vg1t_dev/mods.conf.
+#
+# The RTC framework and the stock `rtc` command are Embox-built-in; the
+# driver below wires the VG1T RTC into them.
+include embox.driver.rtc.rtc
+include embox.driver.rtc.niiet.niiet_rtc
+include embox.cmd.testing.rtc
+include embox.compat.posix.time.time   # provides mktime()/gmtime_r()

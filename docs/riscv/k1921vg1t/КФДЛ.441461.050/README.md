@@ -173,6 +173,9 @@ Diagnostic helpers:
 - [SDRAM bring-up](example-sdram.md) — bring up the 32 MB external SDRAM
   and verify it (no wiring), sources in
   [examples/niet-dev-k1921vg1t/sdram/](../../../../examples/niet-dev-k1921vg1t/sdram/).
+- [RTC](example-rtc.md) — real-time clock via the Embox RTC framework
+  (CR1220 battery backup), driver in
+  [examples/niet-dev-k1921vg1t/rtc/](../../../../examples/niet-dev-k1921vg1t/rtc/).
 
 ## Flashing in dualcore mode (SRV-ON jumper)
 

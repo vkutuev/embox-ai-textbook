@@ -1,0 +1,9 @@
+package embox.driver.rtc.niiet
+
+module niiet_rtc {
+	option string log_level = "LOG_ERR"
+
+	source "niiet_rtc.c"
+
+	depends embox.driver.rtc.rtc
+}
