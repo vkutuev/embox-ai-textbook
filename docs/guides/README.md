@@ -17,3 +17,14 @@ facts live under `docs/riscv/k1921vg1t/`.
   together
 - [RISC-V basics](riscv-basics.md) — registers, CSRs, privilege modes, and the
   calling convention
+
+## Prerequisites (learning order)
+
+| To study | You should already be able to |
+| --- | --- |
+| Embox build system | Git basics; cross-compilation |
+| Commands and drivers | Embedded C (MMIO, `volatile`, read-modify-write) |
+| Interrupts (PLIC) | RISC-V basics (CSRs, privilege modes); a working command |
+| GPIO / timer examples | Memory map; the `pin` shell command |
+| Any driver example | Commands and drivers; the board README (wiring/reset) |
+| Debugging on hardware | JTAG/OpenOCD/GDB; the debug checklist |
