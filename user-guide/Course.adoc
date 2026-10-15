@@ -1,0 +1,32 @@
+= Руководство пользователя Embox AI Textbook
+:author: Vladimir Kutuev
+:doctype: book
+:sectnums:
+:toc: macro
+:toc-title: Содержание
+:chapter-signifier: Глава
+:figure-caption: Рисунок
+:table-caption: Таблица
+:source-highlighter: rouge
+:icons: font
+:imagesdir: images
+
+Материалы распространяются под лицензией
+https://creativecommons.org/licenses/by/4.0/deed.ru[CC BY 4.0].
+Автор — Vladimir Kutuev.
+
+toc::[]
+
+include::Chapters/Chapter1.adoc[]
+
+include::Chapters/Chapter2.adoc[]
+
+include::Chapters/Chapter3.adoc[]
+
+include::Chapters/Chapter4.adoc[]
+
+include::Chapters/Chapter5.adoc[]
+
+include::Chapters/Chapter6.adoc[]
+
+include::Chapters/Chapter7.adoc[]

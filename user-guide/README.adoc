@@ -1,0 +1,37 @@
+= Сборка руководства
+
+Руководство собирается из AsciiDoc в PDF с помощью `asciidoctor-pdf`.
+
+== Сборка через Docker (рекомендуется)
+
+[source,shell]
+----
+docker run --rm -v "$(pwd)":/documents/ \
+  asciidoctor/docker-asciidoctor asciidoctor-pdf Course.adoc
+----
+
+== Сборка локально
+
+[source,shell]
+----
+gem install asciidoctor-pdf   # если ещё не установлен
+asciidoctor-pdf Course.adoc
+----
+
+Результат — `Course.pdf`.
+
+== Скриншоты
+
+Скриншоты кладутся в каталог `images/` и подключаются в главах
+(директивы `image::` сейчас закомментированы — раскомментируйте их после
+добавления файлов):
+
+[cols="1,3", options="header"]
+|===
+|Файл |Что на скриншоте
+|images/opencode-model.png |Выбор модели (провайдера) в OpenCode
+|images/opencode-agent.png |Выбор агента `k1921vg1t-mentor`
+|images/onboarding.png |Онбординг-диалог (вопросы агента)
+|images/mentor-answer.png |Пример ответа наставника
+|images/board.png |Плата КФДЛ.441461.050 и JTAG-адаптер
+|===
