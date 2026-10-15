@@ -56,6 +56,8 @@ is tracked so the directory exists after a fresh clone.
 ## Guardrails
 
 - Write agent instructions, skills, and documentation in English only.
+  Exception: the root `README.md` is written in Russian as the user-facing
+  entry point.
 - Use Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`, etc.) for commit messages.
 - Session context is ephemeral: never rely on chat history to preserve
   decisions. Record decisions, conventions, and rationale in the appropriate
