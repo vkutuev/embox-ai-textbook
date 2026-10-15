@@ -61,6 +61,32 @@ reset from the last NVR cell at address `003F_FFF0h`:
   main and boot areas are erased (except OTP).
 - If a full erase is not needed, `SERVEN` must be low during reset.
 
+## Flashing without a debug adapter (UART bootloader)
+
+The very first flash needs JTAG/OpenOCD, but after a one-time install of
+the NIIET UART bootloader ("Flasher") the chip can be programmed over
+UART with no debug adapter at all.
+
+- Bootloader: <https://gitflic.ru/project/niiet/k1921vkx_flasher> —
+  Python tool `app/k1921vx_flasher.py` (plus `.exe` releases), prebuilt
+  `.bin` images in `bin/`, `.elf` in `firmware/k1921vgxt/releases`. The
+  K1921VG1T is covered by `README_VGxT.md` (shared with VG3T/VG5T/VG7T);
+  the wire protocol is in `NOTES.md`.
+- It is **not** a factory ROM bootloader: it must be flashed once via
+  OpenOCD/JTAG (`make load`). Once installed, the MCU passes through it
+  on every power-on.
+- Interface: UART0 (**TX = B1, RX = B0**, 8N1, auto-baud). Boot-selection
+  pin **BOOTEN = A8**.
+- Entry: pull BOOTEN low (e.g. USB-UART **RTS**), reset the MCU, connect
+  with the tool, then release BOOTEN. On the dev board the CH340B
+  provides RTS (BOOTEN) and DTR (reset) for exactly this flow.
+- The application is linked at `0x0000_2000` (the bootloader occupies
+  `0x0000_0000 - 0x0000_1FFF` and protects its own pages); use the
+  `k1921vg1t_flash_bl.ld` linker script.
+- Supported commands: page read/write/erase (main and NVR areas), full
+  erase, read/modify CFGWORD. Pages occupied by the bootloader are
+  protected from read/erase/write.
+
 ## ECC
 
 Flash ECC corrects one error and detects two (64 data bits protected by 8
@@ -72,3 +98,5 @@ counters `FECCSEC`/`FECCDEC`, addresses `FECCSEA`/`FECCDEA`, interrupts via
 
 - `doc/K1921VG1T/UM_K1921VG1T_10YA.pdf` in
   <https://gitflic.ru/project/niiet/niiet>, chapter 9
+- UART bootloader ("Flasher"): <https://gitflic.ru/project/niiet/k1921vkx_flasher>
+  (`README_VGxT.md`, `NOTES.md`)

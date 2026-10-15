@@ -123,6 +123,7 @@ From the official board documentation (see Sources):
 | Flash in DUALCORE | SRV-ON jumper + reset, then SDK dualcore config (see below) |
 | Hardware reset | `adapter assert srst; sleep 300; adapter deassert srst` (verified; `reset init` is broken on this chip) or `ndmreset` from the debug module |
 | Flash via GDB | override `gdb-flash-erase-start`/`gdb-flash-write-end` with `halt`, then `load` + `compare-sections` |
+| Flash without a debug adapter | one-time install of the UART bootloader ("Flasher") via JTAG, then `k1921vx_flasher` over UART (BOOTEN=A8, UART0 B1/B0, app at `0x2000`) — see [flash.md](../flash.md) |
 | Run flashed image | SRST pulse (see above), or `riscv dmi_write 0x10 0x80000003` / `0x80000001`, `reg pc 0x0`, `resume` |
 
 Detailed experiment records:
