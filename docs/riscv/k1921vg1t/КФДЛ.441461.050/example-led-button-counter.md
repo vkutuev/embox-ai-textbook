@@ -52,8 +52,7 @@ calls (all off, then "on" bits low).
 
 ## Variants
 
-The example exists in three forms, all in
-[`examples/niet-dev-k1921vg1t/led_button_counter/`](../../../../examples/niet-dev-k1921vg1t/led_button_counter/):
+The example exists in three forms:
 
 | Variant | Command | How the button is read | Status |
 | ------- | ------- | ---------------------- | ------ |
@@ -70,10 +69,9 @@ Comparison:
   interrupt is configured, **do not call `gpio_setup_mode()` again** on
   that port — each call re-writes the edge-configuration registers and
   latches a spurious `INTSTATUS` on this silicon, which storms the
-  PLIC. `led_counter_irq.c` therefore masks, clears, and re-arms via
-  the `INTENCLR`/`INTSTATUS`/`INTENSET` registers directly (see
-  [patches](../../../../examples/niet-dev-k1921vg1t/led_button_counter/patches/)
-  and the [experiment journal](experiment-led-button-counter.md)).
+  PLIC. The interrupt variant therefore masks, clears, and re-arms via
+  the `INTENCLR`/`INTSTATUS`/`INTENSET` registers directly (see the
+  [experiment journal](experiment-led-button-counter.md)).
 - **Input subsystem** is the most idiomatic Embox approach, but
   `gpio_button` configures a both-edges interrupt on the idle-high
   button pin, so `INTSTATUS` latches at enable and the PLIC storms
@@ -83,19 +81,23 @@ Comparison:
 
 ## Build and run
 
-1. Copy the example directory into an Embox checkout:
-
-   ```console
-   $ cp -r examples/niet-dev-k1921vg1t/led_button_counter/ <embox>/src/cmds/example/
-   ```
+1. Write the command modules in
+   `<embox>/src/cmds/example/led_button_counter/` (see
+   [Commands and drivers](../../../embox/commands-drivers.md)).
 
 2. In `platform/niiet/templates/k1921vg1t_dev/mods.conf`, inside the
-   `conf` block, add the include lines for **one** variant (see
-   `mods.conf.snippet` in the example directory). The input variant
-   also needs:
+   `conf` block, add the include lines for **one** variant:
 
    ```
+   # polling
+   include embox.cmd.example.led_button_counter.led_counter_poll
+
+   # interrupt-driven
+   include embox.cmd.example.led_button_counter.led_counter_irq
+
+   # input subsystem (also needs the button driver)
    include embox.driver.input.button.gpio_button(pin_port=1, pin_num=3)
+   include embox.cmd.example.led_button_counter.led_counter_input
    ```
 
 3. Build, flash, and reset as in the

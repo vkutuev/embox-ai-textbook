@@ -9,8 +9,9 @@ test. No wiring needed.
 
 ## Build and run
 
-1. Copy `examples/niet-dev-k1921vg1t/sdram/` into `<embox>/src/cmds/example/`.
-2. Add the `include` from `mods.conf.snippet` to `mods.conf`.
+1. Write the command module in `<embox>/src/cmds/example/sdram/` (see
+   [Commands and drivers](../../../embox/commands-drivers.md)).
+2. Add `include embox.cmd.example.sdram.sdram` to `mods.conf`.
 3. Build, flash, reset.
 4. On the console:
 

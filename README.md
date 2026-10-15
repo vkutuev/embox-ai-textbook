@@ -13,6 +13,7 @@ and running it on specific microcontrollers and development boards.
 | `docs/embox/`                         | Architecture-agnostic Embox documentation |
 | `docs/guides/`                        | Architecture-agnostic learning material for newcomers (Git, cross-compilation, embedded C, JTAG/OpenOCD/GDB, RISC-V) |
 | `docs/references.md`                  | Canonical list of upstream sources |
+| `workdir/`                            | User workspace (gitignored): clone Embox/OpenOCD/SDKs here |
 
 ## Agent Instructions
 

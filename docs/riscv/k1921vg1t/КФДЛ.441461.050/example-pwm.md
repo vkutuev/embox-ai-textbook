@@ -37,9 +37,9 @@ include embox.cmd.example.pwm_demo.pwm_demo
 
 ## Build and run
 
-1. Copy `examples/niet-dev-k1921vg1t/pwm_demo/` into
-   `<embox>/src/cmds/example/` and add the `include` from
-   `mods.conf.snippet`.
+1. Write the command module in `<embox>/src/cmds/example/pwm_demo/` (see
+   [Commands and drivers](../../../embox/commands-drivers.md)) and add the
+   `include embox.cmd.example.pwm_demo.pwm_demo` line shown above.
 2. Build, flash, reset.
 3. On the console:
 

@@ -9,9 +9,13 @@ Read the VG1T's internal temperature sensor through the 12-bit ADC
 
 ## Build and run
 
-1. Copy `examples/niet-dev-k1921vg1t/adc_tsensor/` into
-   `<embox>/src/cmds/example/`.
-2. Add the `include` from `mods.conf.snippet` to `mods.conf`.
+1. Write the command module in `<embox>/src/cmds/example/adc_tsensor/`
+   (see [Commands and drivers](../../../embox/commands-drivers.md)).
+2. Add the `include` line to `mods.conf`:
+
+   ```
+   include embox.cmd.example.adc_tsensor.tsensor
+   ```
 3. Build, flash, reset.
 4. On the console:
 

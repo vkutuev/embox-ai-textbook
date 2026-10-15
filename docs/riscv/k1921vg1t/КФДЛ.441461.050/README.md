@@ -149,42 +149,31 @@ Cross-cutting patterns, gotchas, and open questions are consolidated in
 
 - [LED/button counter](example-led-button-counter.md) — USER button
   increments a counter shown in binary on the four LEDs (board LED1–LED4);
-  three variants (polling, GPIO interrupt, input subsystem), sources in
-  [examples/niet-dev-k1921vg1t/led_button_counter/](../../../../examples/niet-dev-k1921vg1t/led_button_counter/).
-  Polling and IRQ variants are verified on hardware; the input variant
-  hits a GPIO interrupt quirk — see the
+  three variants (polling, GPIO interrupt, input subsystem). Polling and
+  IRQ variants are verified on hardware; the input variant hits a GPIO
+  interrupt quirk — see the
   [experiment journal](experiment-led-button-counter.md).
 - [Timer blink](example-timer-blink.md) — LED1 blinking via a busy-wait
-  loop vs. the TMR1 hardware timer interrupt (exact 1 Hz), sources in
-  [examples/niet-dev-k1921vg1t/timer_blink/](../../../../examples/niet-dev-k1921vg1t/timer_blink/).
+  loop vs. the TMR1 hardware timer interrupt (exact 1 Hz).
 - [UART1 echo](example-uart1-echo.md) — echo bytes on UART1 via an
-  external USB-UART dongle (XP2 pins 1/3), sources in
-  [examples/niet-dev-k1921vg1t/uart1_echo/](../../../../examples/niet-dev-k1921vg1t/uart1_echo/).
+  external USB-UART dongle (XP2 pins 1/3).
 - [PCA9685 PWM driver](example-i2c-pca9685.md) — drive an NXP PCA9685
-  16-channel PWM controller over I2C0 (XP1 pins 5/3), sources in
-  [examples/niet-dev-k1921vg1t/pca9685/](../../../../examples/niet-dev-k1921vg1t/pca9685/).
+  16-channel PWM controller over I2C0 (XP1 pins 5/3).
 - [HC-SR04 ultrasonic](example-hcsr04.md) — distance via a TMR1-timed
   echo pulse; requires 5 V + a 10 kΩ/20 kΩ divider (not verified on this
-  board without resistors), sources in
-  [examples/niet-dev-k1921vg1t/hcsr04/](../../../../examples/niet-dev-k1921vg1t/hcsr04/).
+  board without resistors).
 - [PWM output](example-pwm.md) — PWM on PWM1 (TMR1) via the niiet PWM
-  driver (XP1 pin 19), sources in
-  [examples/niet-dev-k1921vg1t/pwm_demo/](../../../../examples/niet-dev-k1921vg1t/pwm_demo/).
+  driver (XP1 pin 19).
 - [DMA copy](example-dma.md) — memory-to-memory DMA copy via DMA0 (no
-  wiring), sources in
-  [examples/niet-dev-k1921vg1t/dma_copy/](../../../../examples/niet-dev-k1921vg1t/dma_copy/).
+  wiring).
 - [ADC temperature sensor](example-adc-tsensor.md) — read the internal
-  temperature sensor via the ADC (channel 63, no wiring), sources in
-  [examples/niet-dev-k1921vg1t/adc_tsensor/](../../../../examples/niet-dev-k1921vg1t/adc_tsensor/).
+  temperature sensor via the ADC (channel 63, no wiring).
 - [Sharp distance sensor](example-sharp-2y0a21.md) — Sharp GP2Y0A21 IR
-  distance on ADC channel 8 (PA8, XP1 pin 27), sources in
-  [examples/niet-dev-k1921vg1t/sharp_2y0a21/](../../../../examples/niet-dev-k1921vg1t/sharp_2y0a21/).
+  distance on ADC channel 8 (PA8, XP1 pin 27).
 - [SDRAM bring-up](example-sdram.md) — bring up the 32 MB external SDRAM
-  and verify it (no wiring), sources in
-  [examples/niet-dev-k1921vg1t/sdram/](../../../../examples/niet-dev-k1921vg1t/sdram/).
+  and verify it (no wiring).
 - [RTC](example-rtc.md) — real-time clock via the Embox RTC framework
-  (CR1220 battery backup), driver in
-  [examples/niet-dev-k1921vg1t/rtc/](../../../../examples/niet-dev-k1921vg1t/rtc/).
+  (CR1220 battery backup).
 
 ## Flashing in dualcore mode (SRV-ON jumper)
 

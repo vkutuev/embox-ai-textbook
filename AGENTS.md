@@ -18,17 +18,30 @@ it on specific microcontrollers and development boards.
 - `docs/guides/` — architecture-agnostic learning material for newcomers
   (Git, cross-compilation, embedded C, JTAG/OpenOCD/GDB, RISC-V)
 - `docs/references.md` — canonical list of upstream sources
-- `examples/<board>/<example>/` — runnable example sources (C code,
-  Mybuild files) referenced from the board documentation
+- `workdir/` — the user's workspace (gitignored): clone Embox, the NIIET
+  OpenOCD fork, SDKs, and other upstream sources here so agents can see
+  what the user is doing
 
 Follow this layout when adding documentation. Preserve the original board
 designation (including Cyrillic characters) in directory names.
 
-## Temporary Files
+## Working directories
 
-`.tmp/` is the local scratch directory for temporary files (builds, clones,
-logs, experiments). It is gitignored; only `.tmp/.gitkeep` is tracked so the
-directory exists after a fresh clone.
+### `workdir/` — the user's workspace
+
+`workdir/` is where the student/user does hands-on work: cloning Embox, the
+NIIET OpenOCD fork, SDKs, and other upstream sources. It is gitignored; only
+`workdir/.gitkeep` is tracked so the directory exists after a fresh clone.
+
+- Recommend that the user clone upstream sources into `workdir/` so agents
+  can inspect what the user is doing.
+- Nothing in `workdir/` (except `.gitkeep`) may be committed.
+
+### `.tmp/` — agent scratch
+
+`.tmp/` is the local scratch directory for the agent's own temporary files
+(builds, clones, logs, experiments). It is gitignored; only `.tmp/.gitkeep`
+is tracked so the directory exists after a fresh clone.
 
 - Put disposable artifacts (toolchain downloads, cloned repositories,
   test logs) in `.tmp/`, never in the repo root or `docs/`.
