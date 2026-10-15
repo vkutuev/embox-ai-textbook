@@ -1,24 +1,67 @@
 # Embox AI Textbook
 
-Textbook for microcontroller programming with the
-[Embox](https://github.com/embox/embox) operating system. Covers Embox itself
-and running it on specific microcontrollers and development boards.
+Интерактивный учебник по программированию микроконтроллера **К1921ВГ1Т**
+(отладочная плата **КФДЛ.441461.050**) с операционной системой **Embox**.
 
-## Documentation Layout
+В репозитории собрана документация по Embox и по работе с конкретными
+микроконтроллерами и платами, а также агент-наставник для OpenCode.
 
-| Path                                  | Purpose                              |
-| ------------------------------------- | ------------------------------------ |
-| `docs/<arch>/<microcontroller>/<board>` | Board-specific documentation, e.g. `docs/riscv/k1921vg1t/КФДЛ.441461.050` |
-| `docs/<arch>/<microcontroller>/`      | Microcontroller-level documentation (core, memory map, peripherals) |
-| `docs/embox/`                         | Architecture-agnostic Embox documentation |
-| `docs/guides/`                        | Architecture-agnostic learning material for newcomers (Git, cross-compilation, embedded C, JTAG/OpenOCD/GDB, RISC-V) |
-| `docs/references.md`                  | Canonical list of upstream sources |
-| `workdir/`                            | User workspace (gitignored): clone Embox/OpenOCD/SDKs here |
+## Агент-наставник `k1921vg1t-mentor`
 
-## Agent Instructions
+Главный способ работы с учебником — агент OpenCode **`k1921vg1t-mentor`**,
+который ведёт себя как ментор или учитель:
 
-Repository-wide rules for AI agents live in [AGENTS.md](AGENTS.md):
+- объясняет материал и новые концепции (Embox, Mybuild, регистры, JTAG и др.);
+- задаёт наводящие вопросы (сократический диалог) и подсказывает идеи;
+- разбирает ошибки и помогает с диагностикой (в том числе через отладчик);
+- **не делает работу за студента** — не выдаёт готовые решения (только в
+  крайнем случае, по явной просьбе).
 
-## License
+Агент адаптируется под ваш опыт, цели и оборудование: при старте он проведёт
+онбординг и составит персональную программу занятий, которую будет фиксировать
+и отмечать в файле `progress.md`.
+
+## Как начать
+
+1. **Установите OpenCode** (v2): <https://opencode.ai>.
+2. **Настройте модель** (провайдера) в OpenCode — агент использует модель
+   текущей сессии.
+3. **Клонируйте репозиторий**:
+
+   ```console
+   $ git clone https://github.com/vkutuev/embox-ai-textbook.git
+   $ cd embox-ai-textbook
+   ```
+
+4. **Выберите агента `k1921vg1t-mentor`** в списке агентов и начните диалог.
+   Агент спросит про ваш опыт, оборудование и цели — и предложит программу.
+
+## Оборудование
+
+Для практической части (сборка, прошивка и запуск Embox на плате) понадобится:
+
+- плата **КФДЛ.441461.050** (NIIET-DEV-K1921VG1T);
+- **JTAG-адаптер** (например, J-Link) и собранный **OpenOCD** от НИИЭТ;
+- **RISC-V toolchain** (варианты установки — в
+  `docs/guides/cross-compilation.md`);
+- консоль по **UART** (на плате есть встроенный USB-UART CH340).
+
+Точный состав и подключение агент уточнит при онбординге; детали подключения
+и прошивки — в `docs/riscv/k1921vg1t/КФДЛ.441461.050/README.md`.
+
+## Куда что класть
+
+| Каталог | Назначение |
+| ------- | ---------- |
+| `docs/` | документация: `guides/` (вводные), `embox/`, `riscv/k1921vg1t/` (МК и плата) |
+| `workdir/` | ваше рабочее место (gitignored): клонируйте сюда Embox, OpenOCD, SDK |
+| `.tmp/` | scratch-каталог агента (не для пользователя) |
+| `progress.md` | ваш прогресс занятий (gitignored, ведётся агентом) |
+
+## Для контрибьюторов и агентов
+
+Правила работы в репозитории — в [AGENTS.md](AGENTS.md) (на английском).
+
+## Лицензия
 
 [Creative Commons Attribution 4.0 International](LICENSE)
