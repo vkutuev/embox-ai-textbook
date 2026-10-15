@@ -39,9 +39,9 @@ the 10 cm / 80 cm datasheet points; treat as approximate.
 
 ## Build and run
 
-1. Copy `examples/niet-dev-k1921vg1t/sharp_2y0a21/` into
-   `<embox>/src/cmds/example/` and add the `include` from
-   `mods.conf.snippet`.
+1. Write the command module in `<embox>/src/cmds/example/sharp_2y0a21/`
+   (see [Commands and drivers](../../../embox/commands-drivers.md)) and
+   add `include embox.cmd.example.sharp_2y0a21.sharp` to `mods.conf`.
 2. Build, flash, reset.
 3. Aim at a flat object and run:
 

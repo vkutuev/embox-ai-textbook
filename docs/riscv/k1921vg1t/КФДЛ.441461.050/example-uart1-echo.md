@@ -39,15 +39,12 @@ include embox.cmd.example.uart1_echo.uart1_echo
 
 ## Build and run
 
-1. Copy the example directory into an Embox checkout:
+1. Write the command module in `<embox>/src/cmds/example/uart1_echo/` — a
+   `uart1_echo.c` with `main()` and a `Mybuild` with `@AutoCmd`/`@Cmd`
+   (see [Commands and drivers](../../../embox/commands-drivers.md)).
 
-   ```console
-   $ cp -r examples/niet-dev-k1921vg1t/uart1_echo/ <embox>/src/cmds/example/
-   ```
-
-2. Add the two `include` lines to
-   `platform/niiet/templates/k1921vg1t_dev/mods.conf` (see
-   `mods.conf.snippet` in the example directory).
+2. Add the two `include` lines shown above to
+   `platform/niiet/templates/k1921vg1t_dev/mods.conf`.
 
 3. Build, flash, reset.
 

@@ -52,15 +52,11 @@ frequency via the PRE_SCALE divider), `set` (per-channel duty), `all`
 
 ## Build and run
 
-1. Copy the example directory into an Embox checkout:
-
-   ```console
-   $ cp -r examples/niet-dev-k1921vg1t/pca9685/ <embox>/src/cmds/example/
-   ```
+1. Write the command module in `<embox>/src/cmds/example/pca9685/` (see
+   [Commands and drivers](../../../embox/commands-drivers.md)).
 
 2. Add the `include embox.cmd.example.pca9685.pca9685` line to
-   `platform/niiet/templates/k1921vg1t_dev/mods.conf` (see
-   `mods.conf.snippet`).
+   `platform/niiet/templates/k1921vg1t_dev/mods.conf`.
 
 3. Build, flash, reset.
 

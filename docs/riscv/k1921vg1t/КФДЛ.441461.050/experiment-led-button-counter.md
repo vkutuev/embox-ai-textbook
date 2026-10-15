@@ -36,7 +36,7 @@ found; the exact storm trigger remains partially open (below):
    one press, and the stack growth zeroed `.data` globals (dead UART RX
    thread = dead console).
 
-**Fix** (in `led_counter_irq.c`): mask the pin on the first edge
+**Fix** (in the interrupt variant): mask the pin on the first edge
 (`INTENCLR`), then debounce and re-arm (`INTSTATUS` clear + `INTENSET`)
 in the main loop. The interrupt never re-enters, so the storm is
 prevented regardless of its exact trigger. Verified: five consecutive
@@ -82,9 +82,7 @@ the `INTENSET` write.
 now decodes to an **edge** trigger on both edges (the level-trigger
 misdecode was the `INT_SECTION` contamination, not the edge choice).
 Verified: boot completes, shell starts, `gpio_button` initializes
-cleanly, `INTEDGESET=8` / `INTSTATUS=0` at idle. Patch + PR description
-in `examples/.../led_button_counter/patches/` and
-`.tmp/PR-gpio-button-fix.md`.
+cleanly, `INTEDGESET=8` / `INTSTATUS=0` at idle.
 
 > The handler's event polarity (`USER_BUTTON_PRESSED` when the pin reads
 > high) is still inverted for this active-low button — a separate,

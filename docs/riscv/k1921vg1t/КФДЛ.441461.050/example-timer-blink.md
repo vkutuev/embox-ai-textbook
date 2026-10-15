@@ -28,9 +28,6 @@ interrupt flag at the wrap; the handler writes 1 to `IC` to clear it.
 
 ## Variants
 
-Both are in
-[`examples/niet-dev-k1921vg1t/timer_blink/`](../../../../examples/niet-dev-k1921vg1t/timer_blink/):
-
 | Variant | Command | Period source | CPU cost |
 | ------- | ------- | ------------- | -------- |
 | Busy-wait | `blink_busy` | delay loop, self-calibrated via `usleep()` + TMR1 counter | 100% while waiting |
@@ -52,15 +49,24 @@ cycle per second (1 Hz).
 
 ## Build and run
 
-1. Copy the example directory into an Embox checkout:
-
-   ```console
-   $ cp -r examples/niet-dev-k1921vg1t/timer_blink/ <embox>/src/cmds/example/
-   ```
+1. Write the two command modules in
+   `<embox>/src/cmds/example/timer_blink/` — `blink_busy.c` and
+   `blink_tmr.c`, each with a `Mybuild` using `@AutoCmd`/`@Cmd` (see
+   [Commands and drivers](../../../embox/commands-drivers.md)).
 
 2. Add the include for one variant to
-   `platform/niiet/templates/k1921vg1t_dev/mods.conf` (see
-   `mods.conf.snippet` in the example directory), build, flash, reset.
+   `platform/niiet/templates/k1921vg1t_dev/mods.conf`:
+
+   ```
+   # busy-wait variant
+   include embox.cmd.example.timer_blink.blink_busy
+
+   # -- or -- timer variant (also needs POSIX signals)
+   include embox.compat.posix.signal
+   include embox.cmd.example.timer_blink.blink_tmr
+   ```
+
+   Build, flash, reset.
 
 3. Run it:
 

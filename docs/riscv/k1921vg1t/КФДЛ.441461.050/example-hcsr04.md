@@ -7,7 +7,7 @@ with the TMR1 free-running counter (189 MHz, 27 MHz HSE × 7).
 > divider.** The HC-SR04 does not respond when powered from 3.3 V (it is
 > specified for 4.5-5.5 V); this was confirmed by probing the sensor pins
 > directly with a logic analyzer. See the
-> [experiment journal](experiment-hcsr04.md). The code below is complete
+> [experiment journal](experiment-hcsr04.md). The example is complete
 > and only needs the 5 V wiring.
 
 ## Hardware
@@ -25,9 +25,9 @@ pair works (e.g. 10k/22k, 4.7k/10k).
 
 ## Build and run
 
-1. Copy `examples/niet-dev-k1921vg1t/hcsr04/` into an Embox checkout
-   (`src/cmds/example/`) and add the `include` line from
-   `mods.conf.snippet` to `mods.conf`.
+1. Write the command module in `<embox>/src/cmds/example/hcsr04/` (see
+   [Commands and drivers](../../../embox/commands-drivers.md)) and add
+   `include embox.cmd.example.hcsr04.hcsr04` to `mods.conf`.
 2. Build, flash, reset.
 3. On the console:
 

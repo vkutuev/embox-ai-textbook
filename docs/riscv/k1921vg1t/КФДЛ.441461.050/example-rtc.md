@@ -16,10 +16,19 @@ input), so the onboard cell does nothing.
 
 ## Build and run
 
-1. Copy `examples/niet-dev-k1921vg1t/rtc/` into `<embox>/src/drivers/rtc/niiet/`.
-2. Add the four `include` lines from `mods.conf.snippet` to `mods.conf`
-   (RTC framework, niiet driver, stock `rtc` command, and the
-   `embox.compat.posix.time.time` module for `mktime`/`gmtime_r`).
+1. Write the niiet RTC driver in `<embox>/src/drivers/rtc/niiet/` — a
+   module implementing `rtc_ops` and registered with `RTC_DEVICE_DEF`
+   (see [Commands and drivers](../../../embox/commands-drivers.md)).
+2. Add these four `include` lines to `mods.conf` (the RTC framework, the
+   niiet driver, the stock `rtc` command, and
+   `embox.compat.posix.time.time` for `mktime`/`gmtime_r`):
+
+   ```
+   include embox.driver.rtc.rtc
+   include embox.driver.rtc.niiet.niiet_rtc
+   include embox.cmd.testing.rtc
+   include embox.compat.posix.time.time
+   ```
 3. Build, flash, reset.
 4. On the console:
 

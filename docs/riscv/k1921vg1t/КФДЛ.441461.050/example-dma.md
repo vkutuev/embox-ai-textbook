@@ -9,11 +9,15 @@ verify the result. No wiring needed.
 
 ## Build and run
 
-1. Copy `examples/niet-dev-k1921vg1t/dma_copy/` into
-   `<embox>/src/cmds/example/`.
-2. In `platform/niiet/templates/k1921vg1t_dev/mods.conf`, add the lines
-   from `mods.conf.snippet` — the DMA driver is **not** in the stock
-   template, so `niiet_dma_drv` must be added.
+1. Write the command module in `<embox>/src/cmds/example/dma_copy/` (see
+   [Commands and drivers](../../../embox/commands-drivers.md)).
+2. In `platform/niiet/templates/k1921vg1t_dev/mods.conf`, add the DMA
+   driver (it is **not** in the stock template) and the command:
+
+   ```
+   include embox.driver.dma.niiet_dma_drv
+   include embox.cmd.example.dma_copy.dma_copy
+   ```
 3. Build, flash, reset.
 4. On the console:
 

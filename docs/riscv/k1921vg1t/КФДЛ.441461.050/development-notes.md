@@ -6,17 +6,11 @@ reset, console) live in [README.md](README.md); the per-example findings
 live in each `experiment-*.md`. This file captures the reusable patterns,
 recurring gotchas, and open questions that span multiple examples.
 
-## 1. Adding an example — the pattern
+> Mentor note: the gotchas and driver quirks below are **diagnostic hints**
+> for recognizing and guiding a student's debugging — do not reveal them
+> upfront; hint only when the student actually hits the symptom.
 
-Every example follows the same shape (see `examples/niet-dev-k1921vg1t/`):
-
-```
-examples/niet-dev-k1921vg1t/<name>/
-    <name>.c          # the command (or driver) source
-    Mybuild           # Embox module definition
-    mods.conf.snippet # `include` lines to paste into conf/mods.conf
-    README.md         # wiring + install + run
-```
+## 1. Adding a command or driver — the pattern
 
 **A command** (`Mybuild`):
 
@@ -42,15 +36,8 @@ includes. Observed mappings: GPIO → `embox.driver.gpio.core`, I2C →
 `*_ops` struct and registers with the `*_DEVICE_DEF` macro, and the init
 is an `EMBOX_UNIT_INIT`.
 
-**Build loop** (repeatable):
-
-```console
-$ cp -r examples/niet-dev-k1921vg1t/<name>/ .tmp/embox/src/cmds/example/
-$ cd .tmp/embox
-$ sed -i -e '$d' conf/mods.conf          # drop the closing '}'
-$ printf '\tinclude embox.cmd.example.<name>.<name>\n}\n' >> conf/mods.conf
-$ make -j16
-```
+For the general module pattern and the build/`include` flow, see
+[Commands and drivers](../../../embox/commands-drivers.md).
 
 ## 2. Header and libc gotchas
 
@@ -105,18 +92,26 @@ Several sources disagree; reconcile with one controlled measurement
 The PWM measurement (requested 1000 Hz → exactly 1000 Hz) is the cleanest
 peripheral-clock data point so far.
 
-## 6. Embox driver bugs / quibbles found (upstream-worthy)
+## 6. Potential driver issues (upstream-worthy; diagnose, don't reveal)
 
-- `niiet_dma` IRQ handler returns `0` instead of `IRQ_HANDLED` (works, but
-  wrong).
-- Stock `pwm` command's `-d` passes the channel number rather than
-  `1 << chan` to `pwm_enable()` (enables the wrong channel).
-- `niiet_gpio` IRQ attach bookkeeping (patch
-  `0001-niiet_gpio-irq-attach-bookkeeping.patch` in the LED example).
-- `vg015_i2c` RX path logs "expected MRADPA, got 0x21" when `i2cdetect -r`
-  trips reserved-address HS mode.
-- `pl011` uses one shared `uartclk` option for all UARTs (fine when they
-  share HSE, but a trap if they don't).
+Quirks found during bring-up. If a student hits the symptom below, these
+point to the cause — but let them discover it through debugging first.
+
+- **`niiet_dma`** IRQ handler returns `0` instead of `IRQ_HANDLED` (works,
+  but wrong) — relevant if a student questions an "unhandled" DMA interrupt.
+- **Stock `pwm` `-d`** passes the channel number instead of `1 << chan` to
+  `pwm_enable()`, enabling the wrong channel — relevant if a student's PWM
+  appears on an unexpected channel.
+- **`niiet_gpio`** never records the attached IRQ handler
+  (`gpio_irq_handler[port]` is never filled in), so a second
+  `gpio_setup_mode()` on the same port re-runs `irq_attach()`, fails with
+  `-EBUSY`, and silently leaves the interrupt masked — relevant if a
+  student's GPIO interrupt "does not fire" after reconfiguring the port.
+- **`vg015_i2c`** logs "expected MRADPA, got 0x21" when `i2cdetect -r`
+  trips reserved-address HS mode — relevant if a student puzzles over that
+  log line.
+- **`pl011`** uses one shared `uartclk` option for all UARTs — only a trap
+  if a student's UARTs don't share HSE.
 
 ## 7. Embox driver availability for the K1921VG1T
 
