@@ -33,5 +33,4 @@ asciidoctor-pdf Course.adoc
 |images/opencode-agent.png |Выбор агента `k1921vg1t-mentor`
 |images/onboarding.png |Онбординг-диалог (вопросы агента)
 |images/mentor-answer.png |Пример ответа наставника
-|images/board.png |Плата КФДЛ.441461.050 и JTAG-адаптер
 |===

@@ -16,7 +16,8 @@ opencode
 В OpenCode выберите агента *k1921vg1t-mentor* (переключатель агентов в
 интерфейсе).
 
-// image::opencode-agent.png[Выбор агента k1921vg1t-mentor]
+.Выбор агента k1921vg1t-mentor
+image::opencode-agent.png[]
 
 === Начните диалог
 

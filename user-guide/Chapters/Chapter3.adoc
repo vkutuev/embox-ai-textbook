@@ -25,4 +25,5 @@ opencode
 Агент использует модель текущей сессии, поэтому до начала работы выберите
 модель (провайдера), через которую OpenCode обращается к ИИ.
 
-// image::opencode-model.png[Выбор модели в OpenCode]
+.Выбор модели в OpenCode
+image::opencode-model.png[]
