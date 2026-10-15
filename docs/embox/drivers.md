@@ -1,7 +1,7 @@
 # Drivers
 
 This page summarizes the user and driver APIs for the most common peripheral
-drivers: GPIO, I2C, flash, and framebuffer.
+drivers: GPIO, I2C, flash, framebuffer, PWM, DMA, RTC, and serial.
 
 ## GPIO
 
@@ -184,6 +184,91 @@ struct fb_info *new_fb = fb_create(&ops, screen_base, screen_size /* bytes */);
 
 Supported controllers: STM32F7Discovery, i.MX6 LVDS, EFM32 LCD display,
 PL110 for IntegratorCP, BOCHS, Cirrus.
+
+## PWM
+
+Header: `drivers/pwm.h`
+
+### User API
+
+```c
+struct pwm_device *pwm_dev_by_id(int id);
+int pwm_set_frequency(struct pwm_device *pwm, int freq_hz);
+int pwm_set_duty(struct pwm_device *pwm, int channel, int duty_ns);
+int pwm_enable(struct pwm_device *pwm, unsigned long channels);
+```
+
+- `pwm_dev_by_id()` looks up a PWM controller by id; it returns `NULL` if
+  the controller is not enabled in the configuration.
+- `pwm_set_frequency()` sets the period (derived from the controller clock).
+- `pwm_set_duty()` sets the high time of a channel **in nanoseconds** (not a
+  percentage; values below 2 ns are rejected).
+- `pwm_enable()` takes a **bitmask** of channels (`1U << chan`).
+
+Board usage:
+[PWM example](../riscv/k1921vg1t/КФДЛ.441461.050/example-pwm.md).
+
+## DMA
+
+Header: `drivers/dma.h` (the "new" DMA API; exported as `<drivers/dma.h>`,
+not `<drivers/dma/dma_new.h>`).
+
+### User API
+
+```c
+struct dma_dev *dma_dev_by_id(int id);
+int dma_init(struct dma_dev *dev);
+int dma_config(struct dma_dev *dev, int chan, struct dma_config *conf);
+int dma_transfer(struct dma_dev *dev, int chan, struct dma_req *req);
+int dma_activate(struct dma_dev *dev, int chan);
+int dma_get_type(struct dma_dev *dev, int type);
+```
+
+A transfer is described by `struct dma_req`: source/destination address
+(`dr_src`/`dr_dest`), transfer width (`dr_src_width`/`dr_dest_width`),
+increment flags (`dr_src_inc`/`dr_dest_inc`), requestor type
+(`dr_src_type`/`dr_dest_type`), size (`dr_size`), and an optional completion
+callback (`dr_callback`, signature `int cb(struct dma_req *, void *, int)`).
+
+`dma_config()` attaches the channel interrupt (which leaks across command
+re-runs — detach it first), `dma_transfer()` programs the transfer, and
+`dma_activate()` starts it. Board usage:
+[DMA copy example](../riscv/k1921vg1t/КФДЛ.441461.050/example-dma.md).
+
+## RTC
+
+Header: `drivers/rtc.h`
+
+### Driver API
+
+An RTC driver implements `struct rtc_ops` (`get_time`, `set_time`, each
+taking a `struct tm *`) and registers a `struct rtc_device` with
+`RTC_DEVICE_DEF(&dev)`; the initializer runs via `EMBOX_UNIT_INIT`. Calendar
+conversion helpers (`gmtime_r`, `mktime`, `strptime`) live in
+`embox.compat.posix.time.time`.
+
+Board usage:
+[RTC example](../riscv/k1921vg1t/КФДЛ.441461.050/example-rtc.md) — the niiet
+driver wraps the 32-bit seconds counter at `0x50005000`.
+
+## Serial (UART)
+
+The `pl011` driver exposes UARTs as POSIX character devices (`/dev/ttyS<N>`).
+Applications use ordinary `open`/`read`/`write`; enabling
+`embox.driver.serial.pl011_ttyS<N>` registers the device and configures the
+pins and clock.
+
+```c
+int fd = open("/dev/ttyS1", O_RDWR);
+read(fd, buf, sizeof(buf));
+write(fd, buf, n);
+```
+
+Board usage:
+[UART1 echo example](../riscv/k1921vg1t/КФДЛ.441461.050/example-uart1-echo.md).
+
+The SPI `pl022` driver (`embox.driver.spi.pl022_spi`) follows the same
+per-device pattern; a loopback example is planned.
 
 ## Sources
 

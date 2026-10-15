@@ -11,7 +11,14 @@ official Embox documentation and wiki.
   QEMU, first application, debugging
 - [Build system](build-system.md) — Mybuild language, modules, configurations,
   make targets
-- [Drivers](drivers.md) — GPIO, I2C, flash, and framebuffer APIs
+- [Drivers](drivers.md) — GPIO, I2C, flash, framebuffer, PWM, DMA, RTC,
+  and serial APIs
+- [Commands and drivers](commands-drivers.md) — writing commands (`@Cmd`)
+  and drivers (`*_DEVICE_DEF`, `EMBOX_UNIT_INIT`)
+- [Driver framework](driver-framework.md) — device classes, `diag`,
+  interrupt controller, clock source, input, Ethernet
+- [Interrupts](interrupts.md) — `irq_attach`/`irq_detach` API and gotchas
+- [POSIX layer](posix.md) — libc surface, time, device files
 - [Platforms](platforms.md) — supported CPU architectures and boards
 - [Porting](porting.md) — porting Embox to a new CPU architecture
 

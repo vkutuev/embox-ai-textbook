@@ -122,7 +122,7 @@ From the official board documentation (see Sources):
 | Flash in LOCKSTEP (default) | `target/k1921vg1t_singlecore.cfg` + `interface/jlink.cfg`, or a one-tap cfg (see below); halt, erase, `flash write_image`, `verify_image` |
 | Flash in DUALCORE | SRV-ON jumper + reset, then SDK dualcore config (see below) |
 | Hardware reset | `adapter assert srst; sleep 300; adapter deassert srst` (verified; `reset init` is broken on this chip) or `ndmreset` from the debug module |
-| Flash via GDB | override `gdb-flash-erase-start`/`gdb-flash-write-end` with `halt`, then `load` + `compare-sections` |
+| Flash via GDB | override `gdb-flash-erase-start`/`gdb-flash-write-end` with `halt`, then `load` + `compare-sections` (see [Flashing via GDB `load`](#flashing-via-gdb-load)) |
 | Flash without a debug adapter | one-time install of the UART bootloader ("Flasher") via JTAG, then `k1921vx_flasher` over UART (BOOTEN=A8, UART0 B1/B0, app at `0x2000`) — see [flash.md](../flash.md) |
 | Run flashed image | SRST pulse (see above), or `riscv dmi_write 0x10 0x80000003` / `0x80000001`, `reg pc 0x0`, `resume` |
 
@@ -268,6 +268,66 @@ Hello, world!
 ```
 
 Verified on a real board (J-Link V9, UART over CH340 at `/dev/ttyUSB0`).
+
+## Flashing via GDB `load`
+
+Instead of the telnet flow, you can flash straight from GDB with the `load`
+command — one session programs the flash, verifies it (`compare-sections`),
+and can then debug the result. Verified with the distro
+`riscv64-linux-gnu-gdb` (17.2) and the NIIET OpenOCD build (see
+[experiment-gdb-flash.md](experiment-gdb-flash.md)).
+
+OpenOCD config (lockstep, J-Link) with the flash events overridden so `load`
+does not trigger the broken `reset init`:
+
+```
+source [find interface/jlink.cfg]
+transport select jtag
+source [find target/k1921vg1t_singlecore.cfg]
+K1921VG1T.cpu configure -event gdb-flash-erase-start { halt }
+K1921VG1T.cpu configure -event gdb-flash-write-end { halt }
+init
+halt
+```
+
+GDB command file (`gdb_load.cmd`):
+
+```
+set pagination off
+set confirm off
+target extended-remote :3333
+monitor halt
+load
+compare-sections
+```
+
+Run:
+
+```console
+$ openocd -s k1921vg1t_sdk/tools/openocd/scripts -f gdbflash.cfg &
+$ riscv64-linux-gnu-gdb -x gdb_load.cmd build/base/bin/embox
+```
+
+`load` programs `.text`/`.rodata`/`.data` through the OpenOCD flash driver
+(about 5 KiB/s at JTAG 100 kHz — a 412 KiB image takes ~80 s), and
+`compare-sections` reads the flash back, reporting `matched` per section.
+Then reset and run the image as in [Flashing and running](#flashing-and-running):
+
+```
+> riscv dmi_write 0x10 0x80000003
+> riscv dmi_write 0x10 0x80000001
+> reg pc 0x0
+> resume
+```
+
+Gotchas:
+
+- The `gdb-flash-erase-start`/`gdb-flash-write-end` overrides are required —
+  the defaults run `reset init`, which times out and fails the erase with
+  `flash_erase returned -304`.
+- `monitor` commands fail while the target is running, and OpenOCD leaves the
+  target running after `load`; do the reset/resume via the OpenOCD telnet
+  port (or halt from GDB first).
 
 ## Sources
 

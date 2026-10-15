@@ -15,6 +15,9 @@ it on specific microcontrollers and development boards.
 - `docs/<arch>/<microcontroller>/` — microcontroller-level documentation
   (core, memory map, peripherals), e.g. `docs/riscv/k1921vg1t/`
 - `docs/embox/` — architecture-agnostic Embox documentation
+- `docs/guides/` — architecture-agnostic learning material for newcomers
+  (Git, cross-compilation, embedded C, JTAG/OpenOCD/GDB, RISC-V)
+- `docs/references.md` — canonical list of upstream sources
 - `examples/<board>/<example>/` — runnable example sources (C code,
   Mybuild files) referenced from the board documentation
 

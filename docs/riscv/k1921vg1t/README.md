@@ -15,12 +15,21 @@ the official user manual, errata, and quick-start guide.
 - [PWM](pwm.md) — PWM via the TMR units, CAPCOM compare, Embox driver
 - [DMA](dma.md) — DMA controller, channel registers, memory-to-memory
 - [ADC](adc.md) — ADC blocks, sequencers, internal temperature sensor
+- [DAC](dac.md) — 12-bit DAC, wave generator, DMA/triggers
 - [Interrupts (PLIC)](interrupts.md) — interrupt vectors, register map,
   programming model
 - [Flash](flash.md) — FlashM/FlashD/OTP, config word, service erase
+- [CRC](crc.md) — configurable CRC engine
+- [HASH](hash.md) — SHA/MD5 hash processor
+- [TRNG](trng.md) — true random-number generator
 - [RTC](rtc.md) — real-time clock, seconds counter, Embox driver
+- [WDT](wdt.md) — watchdog timer, lock and reset behavior
 - [UART](uart.md) — UART register map and baud-rate setup
 - [I2C](i2c.md) — I2C controller register map and Embox driver
+- [SPI](spi.md) — SPI (PL022 SSP) register map and Embox driver
+- [CAN](can.md) — CAN 2.0B (4 nodes) and CAN FD register maps
+- [I2S](i2s.md) — I2S interface register map
+- [Ethernet](ethernet.md) — Ethernet MAC, RGMII, descriptor rings
 - [GPIO](gpio.md) — GPIO port registers
 - [Debugging](debugging.md) — JTAG, OpenOCD, toolchain, SDK
 - [Errata](errata.md) — known silicon issues and workarounds

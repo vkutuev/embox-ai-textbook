@@ -126,7 +126,8 @@ peripheral-clock data point so far.
 - **Framework exists, driver added here**: RTC.
 - **No driver — programmed directly in examples**: ADC (`tsensor`,
   `sharp`), SDRAM/EMC (`sdram`).
-- **No driver, not yet covered**: CRC/HASH, TRNG, WDT, DAC, I2S, Ethernet.
+- **No driver, documented but no example yet**: CRC, HASH, TRNG, WDT, DAC,
+  I2S, Ethernet (register maps are in `docs/riscv/k1921vg1t/`).
 
 ## 8. Remaining candidate examples
 
