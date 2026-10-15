@@ -30,4 +30,4 @@ I2C, PWM, DMA, ADC, RTC и так далее).
 === Лицензия
 
 Документация распространяется под лицензией Creative Commons Attribution 4.0
-International (CC BY 4.0). Автор — Vladimir Kutuev.
+International (CC BY 4.0). Автор — Владимир Кутуев.

@@ -1,5 +1,5 @@
 = Руководство пользователя Embox AI Textbook
-:author: Vladimir Kutuev
+:author: Владимир Кутуев
 :doctype: book
 :sectnums:
 :toc: macro
@@ -13,7 +13,7 @@
 
 Материалы распространяются под лицензией
 https://creativecommons.org/licenses/by/4.0/deed.ru[CC BY 4.0].
-Автор — Vladimir Kutuev.
+Автор — Владимир Кутуев.
 
 toc::[]
 
