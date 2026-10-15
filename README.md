@@ -53,4 +53,6 @@
 
 ## Лицензия
 
-[Creative Commons Attribution 4.0 International](LICENSE)
+Автор — Vladimir Kutuev. Материалы распространяются под лицензией
+[Creative Commons Attribution 4.0 International](LICENSE) (CC BY 4.0).
+О стороннем материале (NIIET, Embox) — см. [NOTICE.md](NOTICE.md).
